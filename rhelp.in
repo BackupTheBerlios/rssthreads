@@ -1,0 +1,35 @@
+A single RSS item is represented this way:
+
+[(ID)] (Title)
+
+DATE: (Publication Date)
+CATEGORIES: (List of Categories)
+(Item Link)
+
+(Description)
+
+GUID: (<guid> Element)
+(Extra Elements - optional)
+
+MARKS: (Marks if any)
+(DB Recording Date)   (current position in set)/(overall amount to read)
+:
+
+ID in brackets is a record ID in the database. The colon at the bottom
+is the command prompt. Commands are single letters combined into one string.
+After you press Enter they will be executed one by one and then the next item
+will be shown. Commands can be the following:
+
+r/R   set/unset Read mark
+p/P   set/unset Primary mark
+s/S   set/unset Secondary mark
+d/D   set/unset Delete mark
+-     go one item backward
++     jump over one item forward
+b     start the browser program with item link as a parameter
+h     display this help
+Q     quit from the reader
+
+Commands can be repeated multiple times (useful for + and -). The Read mark is
+automatically set after the item has been shown. Deletion of suitably marked
+items is not currently implemented (you can do it using psql).
