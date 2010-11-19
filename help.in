@@ -65,7 +65,7 @@ characteristics (e.g. to select items to read with --read, --dump), etc.
 -p, --table=tablename
 		set/specify channel's database table name; tablename can't be
 		longer than 32 symbols; can be used with all the actions
--i, --interval=interval
+-n, --interval=interval
 		set interval between single channel transactions (downloads);
 		interval is in the form of number of seconds, or hh:mm:ss, and
 		so on; can be used with --create and --alter
