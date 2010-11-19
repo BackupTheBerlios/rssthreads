@@ -114,8 +114,8 @@ characteristics (e.g. to select items to read with --read, --dump), etc.
 		be used with --read, --dump, --print-links, --mark
 -B, --browser=cmdline
 		set a command line the browser program will be started with in
-		the reader; the `%s' pattern inside the cmdline is to be
-		replaced with item link; the default cmdline is "lynx %s" or
+		the reader; the `%%s' pattern inside the cmdline is to be
+		replaced with item link; the default cmdline is "lynx %%s" or
 		that's been set with RSSTH_BROWSER environment variable
 -v, --verbose=num
 		set the verbosity level; num is one of:
