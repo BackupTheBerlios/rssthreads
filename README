@@ -31,7 +31,7 @@ Protocols
    specification. I don't know, whether it will work correctly with older
    versions of the protocol.
 
-   It doesn't yet does HTTP redirections. Generally, if it receives a
+   It doesn't yet do HTTP redirections. Generally, if it receives a
    HTTP response with header of type different from `200 OK', it just
    outputs that whole header and dies (if there is several threads,
    then just one thread dies; if there is a redirection header, you can take
@@ -81,7 +81,7 @@ Database Layout
    PubDate          timestamp(0) item publication date (<pubDate> element)
                     with time
                     zone
-   RecDate          timestamp(0) item recording date (i.e. where it was
+   RecDate          timestamp(0) item recording date (i.e. when it was
                     with time    fetched to database)
                     zone
    GUID             text         item 'guid' field
