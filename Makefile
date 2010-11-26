@@ -13,7 +13,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-CC = gcc -O0 -g
+CC = gcc -g
 SRC = rssthreads.c parser.c http.c db.c tools.c util.c rssthreads.h \
 		help.in rhelp.in
 OBJ = rssthreads.o parser.o http.o db.o tools.o util.o
@@ -46,11 +46,4 @@ rhelp.h: rhelp.in
 		rhelp.in >rhelp.h
 
 clean:
-	rm rssthreads ex *.o help.h rhelp.h
-wc:
-	wc $(SRC)
-rev:
-	ci -r 0.1 -l $(SRC) Makefile
-
-ex: ex.c
-	$(CC) -lpthread -lpq -o ex ex.c 
+	rm rssthreads *.o help.h rhelp.h
