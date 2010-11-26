@@ -7,14 +7,14 @@ RSS Threads
    is because each RSS channel runs cyclically in an individual program's
    thread of control during the process of fetching and recording RSS.
 
-   Originally, the primary goal in writing this piece of soft was to have
-   such a tool aiming to grab RSS so that to get ability later to do things
-   with them using SQL. Then, little by little, various functions were
-   added which, using SQL internally, give more convenient way to work
-   with recorded feeds, from command line. So I think, this program can be
-   used at least in two ways: a) as a command-line RSS aggregator/viewer;
-   b) simultaneously with, say, web scripts processing stuff collected
-   by it in the database.
+   Originally, the primary goal in writing this piece of soft was to
+   have such a tool helping to collect RSS the way that makes it possible
+   to manage them using SQL afterwards. Then, little by little, various
+   functions were added which, using SQL internally, give more convenient
+   way to work with recorded feeds, from command line. So I think, this
+   program can be used at least in two ways: a) as a command-line RSS
+   aggregator/viewer; b) simultaneously with, say, web scripts processing
+   stuff collected by it in the database.
 
 Why PostgreSQL?
 
@@ -60,7 +60,7 @@ Database Layout
    ------           ----         -----------
    ID               integer      unique channel ID
    Active           boolean      wether the channel is active (i.e. subject
-                                 to be processed by the program)
+                                 to be processed by program)
    URL              text         channel's URL
    Interval         interval     refresh interval
    TableName        text         channel's database table name
@@ -122,7 +122,17 @@ Installation
    The source package is not yet autoconf'ed. The only way to install
    it is to run `make' and then, optionally, copy that sole useful file,
    the executable named `rssthreads', into a preferable location.
+   
+   Now, what's needed by this program to work. 
+      
+      1. Posix Threads library (libpthread), which usually comes with
+         GNU C Library.
+
+      2. PostgreSQL database. It must be in thread-safe variant, i.e.
+         compiled with --enable-thread-safety configure option.
+  
+      3. Expat XML parser library (http://expat.sourceforge.net).
 
 
-With best regards,
+Best regards,
 Serge Baumer <baumer@users.berlios.de>
