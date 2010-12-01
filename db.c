@@ -17,6 +17,8 @@
 #include "rssthreads.h"
 
 PGconn * db_connect (const struct selector *sel) {
+	msg_debug ("db_connect() start with keys:", sel->dbKeys, NULL);
+
 	PGconn *db = PQconnectdb (sel->dbKeys);
 	if (PQstatus(db) == CONNECTION_BAD) {
 		msg_echo ("Can't connect to database server:",
@@ -31,6 +33,8 @@ PGconn * db_connect (const struct selector *sel) {
 }
 
 PGresult * db_exec (PGconn *db, const char *sql, unsigned int nParms, ...) {
+	msg_debug ("db_exec() SQL template:", sql, NULL);
+
 	PGresult *res;
 	if (nParms) {
 		const char *parmValues[nParms];
@@ -347,5 +351,6 @@ PGconn * db_open (rss_context context, const struct selector *sel) {
 }
 
 void db_close (PGconn *db) {
+	msg_debug ("db_close()", NULL);
 	PQfinish (db);
 }
