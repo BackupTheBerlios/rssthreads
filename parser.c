@@ -15,20 +15,26 @@
 */
 
 #include "rssthreads.h"
+#include "encodings.h"
 
 void XMLCALL rss_xml (void *data, const XML_Char *version,
 		const XML_Char *encoding, int standalone) {
 	rss_context context = (rss_context) data;
 	
+#if 0
 	if (encoding) {
-		if (PQsetClientEncoding(context->db, encoding) == -1) 
+		char _enc[30], *enc = _enc;
+		strcpy (enc, encoding);
+		translate_encoding (enc);
+
+		if (PQsetClientEncoding(context->db, enc) == -1) 
 			msg_verbose ("PQsetClientEncoding() for encoding",
-					encoding, "failed.", NULL);
+					enc, "failed.", NULL);
 	}
+#endif
 }
 
 void XMLCALL rss_opentag(void *data, const char *element, const char **attributes) {
-	//	fflush (stdout); fputs ("<<<OPENING TAG>>>", stderr); fputs (element, stderr); fputc ('\n', stderr); fflush (stderr);
 	rss_context context, nextContext;
 	context = (rss_context) data;
 	XML_Parser parser = context->parser;
@@ -45,6 +51,27 @@ void XMLCALL rss_opentag(void *data, const char *element, const char **attribute
 	/* put new context on stack */
 
 	XML_SetUserData (parser, nextContext);
+}
+
+int XMLCALL rss_unknown_enc (void *data, const char *name,
+		XML_Encoding *info) {
+	#define ENCMAPS_LENGTH (sizeof(encmaps)/XML_ENCODING_MAP_SIZE)
+	int i, code = 0;
+	for (i = 0 ; i < ENCMAPS_LENGTH ; i++) {
+		if (!strcmp (name, encmaps[i].name)) {
+			for ( ; code < 256 ; code++) {
+				info->map[code] = encmaps[i].map[code];
+			}
+		}
+	}
+	if (!code) {
+		return XML_STATUS_ERROR;
+	} else {
+		info->data = NULL;
+		info->convert = NULL;
+		info->release = NULL;
+		return XML_STATUS_OK;
+	}
 }
 
 void XMLCALL rss_cdata(void *data, const char *str, int len) {
@@ -168,6 +195,7 @@ void set_parser_callbacks(XML_Parser parser) {
 	XML_SetXmlDeclHandler (parser, rss_xml);
 	XML_SetElementHandler (parser, rss_opentag, rss_closetag);
 	XML_SetCharacterDataHandler (parser, rss_cdata);
+	XML_SetUnknownEncodingHandler (parser, rss_unknown_enc, NULL);
 }
 
 void clear_item (rss_item item) {
@@ -179,6 +207,14 @@ void clear_item (rss_item item) {
 	if (item->guid) free (item->guid);
 	if (item->extra) free (item->extra);
 	if (item->cats) free (item->cats);
+}
+void try_insert (PGconn *db, char *table, char* id, char *field, char *value, char *spare) {
+	char sql[LINE_MAX];
+	concat (sql, "UPDATE ", table,
+			" SET ", field, " = $1 WHERE ID = ", id, NULL);
+
+	if (!db_exec (db, sql, 1, value))
+		db_exec (db, sql, 1, spare);
 }
 
 int record_item (const rss_item item) {
@@ -275,6 +311,7 @@ int record_item (const rss_item item) {
 		}
 	}
 	
+	char id[20];
 	parmValues[0] = item->title;
 	parmValues[1] = item->link;
 	parmValues[2] = item->description;
@@ -289,16 +326,36 @@ int record_item (const rss_item item) {
 			7, NULL, parmValues, NULL, NULL, 0);
 
 	if (res) {
-		ExecStatusType status;
-		switch (status = PQresultStatus (res)) {
-			case PGRES_COMMAND_OK:
+		ExecStatusType status = PQresultStatus (res);
+		char *sqlstate;
+		switch (status) {
+			case PGRES_FATAL_ERROR:
+				sqlstate = PQresultErrorField (res, PG_DIAG_SQLSTATE);
+				if (!strcmp(sqlstate, "22P05")) {    /*UNTRANSLATABLE CHARACTER*/
+					#define SPARE_VALUE "<ENCODING CONVERSION ERROR>"
+					db_exec (db, concat (buf, "INSERT INTO ", table, " (RecDate) "
+								"VALUES (CURRENT_TIMESTAMP)", NULL), 0);
+					strcpy (id, PQgetvalue (db_exec (db, concat (buf,
+						"SELECT CURRVAL('", table, "_id_seq')", NULL), 0), 0, 0));
+					try_insert (db, table, id, "Title", item->title, SPARE_VALUE);
+					try_insert (db, table, id, "Link", item->link, SPARE_VALUE);
+					try_insert (db, table, id, "Description", item->description, SPARE_VALUE);
+					try_insert (db, table, id, "PubDate", item->pubDate, SPARE_VALUE);
+					try_insert (db, table, id, "GUID", item->guid, SPARE_VALUE);
+					try_insert (db, table, id, "Categories", catsbuf, SPARE_VALUE);
+					try_insert (db, table, id, "ExtraElements", item->extra, SPARE_VALUE);
+				}
 				break;
-			default:
-				msg_echo ("Item recording",
-						PQresultErrorMessage (res), NULL);
-				PQclear (res);
-				clear_item (item);
-				return 0;
+		}
+		if (status != PGRES_COMMAND_OK) {
+			msg_echo ("Item recording error:", PQresStatus(status),
+					"\n\tItem GUID:", item->guid,
+					"\n\tSQLSTATE code:",
+					PQresultErrorField(res, PG_DIAG_SQLSTATE), 
+					"\n\t", PQresultErrorMessage (res), NULL);
+			PQclear (res);
+			clear_item (item);
+			return 0;
 		}
 		PQclear (res);
 	} else {
@@ -308,7 +365,6 @@ int record_item (const rss_item item) {
 		return 0;
 	}
 
-	char id[20];
 	if (res = db_exec (db, concat (buf,
 					"SELECT CURRVAL('", table, "_id_seq')", NULL), 0)) {
 		strcpy (id, PQgetvalue (res, 0, 0));
@@ -318,7 +374,6 @@ int record_item (const rss_item item) {
 		return 0;
 	}
 
-	char cat_id[20];
 	if (item->cats) {
 		entry = NULL;
 		while (entry = argz_next(item->cats, item->cats_len, entry)) {

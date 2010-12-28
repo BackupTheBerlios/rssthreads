@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <fcntl.h> 
+#include <locale.h>
 
 #define RSSTH_DEFAULT_INTERVAL "1800"
 
@@ -60,6 +61,7 @@ typedef struct _rssContext /* rss_context type definition */ {
 	int pos;							/* position in the XML stack */
 } *rss_context;
 #define RSS_CONTEXT_SIZE sizeof(struct _rssContext)
+
 /* rssthreads.c */ rss_context rsstopg_create_context (rss_context prev); /*
 	creates rss_context object from object prev or just creates it
 	when prev is null.  */
@@ -168,6 +170,10 @@ struct selector /* multi-purpose selection structure */ {
 /* util.c */ void * mempcpy (void *dest, const void *src, size_t n); /*
 	replacement for the library function that depends on the _GNU_SOURCE macro */
 #endif
+/* util.c */ int translate_encoding (char *charset); /*
+	Attempt to translate RSS encoding designation go PG one. Return true
+	on success.
+*/
 
 /* db.c */ PGconn * db_connect (const struct selector *sel); /*
 	establishes database connection */

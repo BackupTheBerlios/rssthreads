@@ -110,6 +110,8 @@ int makestring (char **str, const char *mem, int len) {
 }
 
 time_t parse_time (const char *timestr) {
+	setlocale (LC_ALL, "C");
+
 	time_t base;
 	long int offset = 0;
 	struct tm brtime;
@@ -150,6 +152,7 @@ time_t parse_time (const char *timestr) {
 	}
 	time_t result = base - offset;
 //printf ("Time: %s", ctime (&result));
+	setlocale (LC_ALL, "");
 	return base - offset;
 }
 
@@ -476,4 +479,27 @@ void * mempcpy (void *dest, const void *src, size_t n) {
 	char *retval = (char *) dest + n;
 	return (void *) retval;
 } 
+#endif
+
+#if 0
+int translate_encoding (char *encoding) {
+	#define ENCQ (sizeof(encname) / sizeof(encname[0]))
+	unsigned int i;
+	int translated = 0;
+
+	msg_debug ("name translation for encoding:", encoding, NULL);
+
+	for (i = 0 ; i < ENCQ ; i++) {
+		if (!strcmp (encoding, encname[i].rss)) {
+			translated = 1;
+			encoding = encname[i].pg;
+			break;
+		}
+	}
+
+	msg_debug ("\tresulting encoding name:", encoding, NULL);
+
+	return translated;
+}
+	
 #endif

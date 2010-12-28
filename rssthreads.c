@@ -116,6 +116,11 @@ int rss_thread (void *arg) {
 		PGconn *db;
 		PGresult *res;
 		db = db_open (context, sel);
+		if (PQsetClientEncoding(db, "UTF8")) {
+			msg_echo ("PQsetClientEncoding() failed. Current encoding is",
+					pg_encoding_to_char(PQclientEncoding(db)), NULL);
+		}
+
 
 		rssth_get (context);
 
@@ -161,8 +166,9 @@ void interrupt_handler (int sig) {
 
 int rssth_collect (struct selector *sel) {
 	PGconn *db = db_connect(sel);
+	PGresult *res;
 	if (!db) return EXIT_FAILURE;
-	PGresult *res = db_exec (db, "SELECT "
+	res = db_exec (db, "SELECT "
 			"ID, URL, TableName, EXTRACT (epoch FROM Interval) "
 			"FROM RSS WHERE Active IS true", 0);
 	db_close (db);
@@ -199,6 +205,7 @@ int rssth_collect (struct selector *sel) {
 			th_sel[i].table = PQgetvalue(res, i, 2);
 			th_sel[i].interval = PQgetvalue(res, i, 3);
 
+			sleep (15);
 			pthread_create (&thread[i], NULL,
 					(void *) &rss_thread, (void *) &th_sel[i]);
 		}
@@ -268,6 +275,8 @@ int main (int argc, char **argv) {
 	action_var action = collect;
 	int opt;
 	progname = argv[0];
+
+	setlocale (LC_ALL, "");
 
 	struct selector sel;
 	memset (&sel, 0, sizeof(sel));

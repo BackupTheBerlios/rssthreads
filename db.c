@@ -61,15 +61,14 @@ PGresult * db_exec (PGconn *db, const char *sql, unsigned int nParms, ...) {
 			case PGRES_TUPLES_OK:
 				break;
 			default:
-				msg_echo ("SQL command execution",
-						PQresultErrorMessage (res), NULL);
-				msg_echo ("\tSQL:", sql, NULL);
+				msg_echo ("SQL command execution", PQresultErrorMessage (res),
+					"\tSQL:", sql, NULL);
 				PQclear (res);
 				res = NULL;
 		}
 	} else {
-		msg_echo ("SQL command execution error:", PQerrorMessage (db), NULL);
-		msg_echo ("\tSQL:", sql, NULL);
+		msg_echo ("SQL command execution error:", PQerrorMessage (db),
+				"\tSQL:", sql, NULL);
 	}
 
 	return res;

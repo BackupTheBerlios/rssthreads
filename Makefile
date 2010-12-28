@@ -22,7 +22,7 @@ rssthreads: $(OBJ)
 	$(CC) -lexpat -lpq -lpthread -o rssthreads $(OBJ)
 rssthreads.o: rssthreads.c rssthreads.h help.h
 	$(CC) -c rssthreads.c
-parser.o: parser.c rssthreads.h
+parser.o: parser.c rssthreads.h encodings.h
 	$(CC) -c parser.c 
 http.o: http.c rssthreads.h
 	$(CC) -c http.c
