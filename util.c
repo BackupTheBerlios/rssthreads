@@ -254,19 +254,19 @@ int append_where_clause (char **sql, struct selector *sel, const char* table) {
 		if (sel->title_cs) {
 			conditional_and();
 			append (sql, concat(buf, table, ".Title ~ '",
-						sel->title, "'", NULL));
+						sel->title_cs, "'", NULL));
 		}
 
 		if (sel->title_nomatch) {
 			conditional_and();
 			append (sql, concat(buf, table, ".Title !~* '",
-						sel->title, "'", NULL));
+						sel->title_nomatch, "'", NULL));
 		}
 
 		if (sel->title_nomatch_cs) {
 			conditional_and();
 			append (sql, concat(buf, table, ".Title !~ '",
-						sel->title, "'", NULL));
+						sel->title_nomatch_cs, "'", NULL));
 		}
 
 		if (sel->description) {
@@ -278,19 +278,19 @@ int append_where_clause (char **sql, struct selector *sel, const char* table) {
 		if (sel->description_cs) {
 			conditional_and();
 			append (sql, concat(buf, table, ".Description ~ '",
-						sel->description, "'", NULL));
+						sel->description_cs, "'", NULL));
 		}
 
 		if (sel->description_nomatch) {
 			conditional_and();
 			append (sql, concat(buf, table, ".Description !~* '",
-						sel->description, "'", NULL));
+						sel->description_nomatch, "'", NULL));
 		}
 
 		if (sel->description_nomatch_cs) {
 			conditional_and();
 			append (sql, concat(buf, table, ".Description !~ '",
-						sel->description, "'", NULL));
+						sel->description_nomatch_cs, "'", NULL));
 		}
 
 		if (sel->link2) {
