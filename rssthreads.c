@@ -223,8 +223,8 @@ int rssth_collect (struct selector *sel) {
 const char *progname;
 
 #define LONGOPTS_INDEX \
-	"a::bc::d::e:f:g:hi::l:m:n:op:r::st:u:v:x:" \
-	"A:B:F:G:I:K:L::M:OP::R:T:U:X"
+	"a::c::d::e:f:g:hi::l:m:nop:r::st:u:v:x" \
+	"A:B:CF:I:K:L::N:P::R:T:U:"
 static const struct option longopts[] = {
 	{"setup", no_argument, NULL, 's'},
 	{"create", optional_argument, NULL, 'c'},
@@ -237,26 +237,23 @@ static const struct option longopts[] = {
 	{"mark", required_argument, NULL, 'F'},
 	/* end of actions */
 	{"db-keys", required_argument, NULL, 'K'},
-	{"active", required_argument, NULL, 'A'},
+	{"active", no_argument, NULL, 'A'},
+	{"not", no_argument, NULL, 'n'},
+	{"case", no_argument, NULL, 'C'},
 	{"url", required_argument, NULL, 'u'},
 	{"table", required_argument, NULL, 'p'},
-	{"interval", required_argument, NULL, 'n'},
+	{"interval", required_argument, NULL, 'N'},
 	{"id", required_argument, NULL, 'I'},
 	{"title", required_argument, NULL, 't'},
 	{"link", required_argument, NULL, 'l'},
 	{"description", required_argument, NULL, 'T'},
-	{"pubdate", required_argument, NULL, 'U'},
-	{"recdate", required_argument, NULL, 'R'},
-	{"before", no_argument, NULL, 'b'},
+	{"pub-from", required_argument, NULL, 'U'},
+	{"rec-from", required_argument, NULL, 'R'},
 	{"categories", required_argument, NULL, 'g'},
-	{"no-categories", required_argument, NULL, 'G'},
-	{"extra", no_argument, NULL, 'x'},
-	{"no-extra", no_argument, NULL, 'X'},
+	{"show-extra", no_argument, NULL, 'x'},
 	{"marked", required_argument, NULL, 'm'},
-	{"not-marked", required_argument, NULL, 'M'},
 	{"sort-field", required_argument, NULL, 'f'},
-	{"sort-asc", no_argument, NULL, 'o'},
-	{"sort-desc", no_argument, NULL, 'O'},
+	{"asc-sort", no_argument, NULL, 'o'},
 	{"tuple", required_argument, NULL, 'e'},
 	{"browser", required_argument, NULL, 'B'},
 	{"verbose", required_argument, NULL, 'v'},
@@ -325,6 +322,10 @@ int main (int argc, char **argv) {
 		case 'd': sel.deleteMark = VALUE; break; \
 	}
 
+	unsigned short inv = 0, cs = 0;
+	#define invflag (inv ? inv-- : inv)
+	#define csflag (cs ? cs-- : cs)
+
 	while ((opt = getopt_long (argc, argv, LONGOPTS_INDEX,
 					longopts, NULL)) != -1) {
 		switch (opt) {
@@ -365,46 +366,83 @@ int main (int argc, char **argv) {
 				break;
 			case 'K':
 				sel.dbKeys = optarg; break;
+			case 'n':
+				inv = 1; break;
 			case 'u':
 				set_link(); break;
 			case 'p':
 				set_table() break;
-			case 'n':
+			case 'N':
 				sel.interval = optarg; break;
 			case 'A':
-				sel.active = optarg; break;
+				if (invflag)
+					sel.active = "no";
+				else
+					sel.active = "yes";
+				break;
 			case 'I':
 				set_id(); break;
 			case 't':
-				sel.title = optarg; break;
+				if (invflag) {
+					if (csflag)
+						sel.title_nomatch_cs = optarg;
+					else
+						sel.title_nomatch = optarg;
+				} else {
+					if (csflag)
+						sel.title_cs = optarg;
+					else
+						sel.title = optarg;
+				}
+				break;
 			case 'l':
 				set_link(); break;
 			case 'U':
+				if (invflag) sel.before = 1;
 				sel.pubDate = optarg; break;
 			case 'R':
+				if (invflag) sel.before = 1;
 				sel.recDate = optarg; break;
-			case 'b':
-				sel.before = 1; break;
 			case 'T':
-				sel.description = optarg; break;
+				if (invflag) {
+					if (csflag) 
+						sel.description_nomatch_cs = optarg;
+					else
+						sel.description_nomatch = optarg;
+				} else {
+					if (csflag)
+						sel.description_cs = optarg;
+					else
+						sel.description = optarg;
+				}
+				break;
 			case 'g':
-				sel.cats = optarg; break;
-			case 'G':
-				sel.noCats = optarg; break;
+				if (invflag)
+					sel.noCats = optarg;
+				else
+					sel.cats = optarg;
+				break;
 			case 'x':
-				sel.hideExtra = 0; break;
-			case 'X':
-				sel.hideExtra = 1; break;
+				if (invflag)
+					sel.hideExtra = 1;
+				else
+					sel.hideExtra = 0;
+				break;
 			case 'm':
-				set_mark (1); break;
-			case 'M':
-				set_mark (-1); break;
+				if (invflag) {
+					set_mark (-1);
+				} else {
+					set_mark (1);
+				}
+				break;
 			case 'f':
 				sel.sortField = optarg; break;
 			case 'o':
-				sel.sortForward = 1; break;
-			case 'O':
-				sel.sortForward = 0; break;
+				if (invflag)
+					sel.sortForward = 0;
+				else
+					sel.sortForward = 1;
+				break;
 			case 'e':
 				sel.tuple = optarg; break;
 			case 'B':

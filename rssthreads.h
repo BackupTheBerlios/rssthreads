@@ -73,7 +73,13 @@ struct selector /* multi-purpose selection structure */ {
 	char *id, *id2;
 	unsigned short id2_auto;		/* whether id2 is auto-set from id */
 	char *title;
+	char *title_cs;
+	char *title_nomatch;
+	char *title_nomatch_cs;
 	char *description;
+	char *description_cs;
+	char *description_nomatch;
+	char *description_nomatch_cs;
 	char *link, *link2;
 	unsigned short link2_auto;		/* like with id */
 	char *table, *table2;
@@ -93,7 +99,7 @@ struct selector /* multi-purpose selection structure */ {
 	char *sortField;
 	unsigned short sortForward;	/* default is descending sort order */
 	char *tuple;
-	char *markSet;						/* argument of the '--mark' action */
+	char *markSet;						/* argument of '--mark' action */
 	unsigned short hideExtra;	   /* default is descending sort order */
 	char *browser;
 };

@@ -34,16 +34,16 @@ are:
 		d/D	set/unset Delete mark
 -h, --help	you have just used this option ;-)
 
-PARAMETERS: Parameters serve to specify the objects (whole channels or
-particular items in channel), or some characteristics of the objects on that
-the action has to be performed. If an action implies a channel to be specfied,
+PARAMETERS: Parameters mainly serve to specify objects (whole RSS channels or
+particular items in a channel), or some characteristics of objects on that
+action has to be performed. If action implies a channel to be specfied,
 the very first specification of id or url or table name is taken for this (it
-may be the argument of an action or --id, --url or --table parameters). All the
+may be the argument of action or --id, --url or --table parameters). All the
 rest are used to specify new attributes (e.g. for --create or --alter), items
 characteristics (e.g. to select items to read with --read, --dump), etc.
 -K, --db-keys=conninfo
 		database connection settings; conninfo consists of a number of
-		pairs key=value separated by spaces; if value contains spaces
+		pairs key=value separated by spaces; if the value contains spaces
 		it must be quoted by single quotes; some possible keys:
 		host       database server host
 		port       port number
@@ -52,9 +52,18 @@ characteristics (e.g. to select items to read with --read, --dump), etc.
 		password   password
 		see documentation for PQconnectdb() function for more info
 	(http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html)
--A, --active=yes|no
+-n, --not
+		inverts meaning of the next option (or the first option among subsequent
+		ones, that permits such inversion); actual with --active, --title,
+		--description, --pub-from, --rec-from, --categories, --extra, --marked,
+		and --asc-sort
+-C, --case
+		says that pattern matching must be case sensitive;
+		affects the first (only) occurence of --title or --description option
+		among subsequent ones
+-A, --active
 		set channel to be active (i.e. assigned to be processed by
-		aggregator) or not (i.e. just hold it's place in database); used
+		aggregator rather than just hold it's place in database); used
 		with --alter; all new channels are active by default
 -u, --url=link
 -l, --link=link	set/specify link (url); can be used with --create, --info,
@@ -78,37 +87,33 @@ characteristics (e.g. to select items to read with --read, --dump), etc.
 		match items whose title or description field(s) match(es)
 		regular expression regexp; can be used with --read, --dump,
 		--print-links, --mark
--U, --pubdate=date
--R, --recdate=date
--b, --before
+-U, --pub-from=date
+-R, --rec-from=date
 		publication date (item's field) and date when item has been
-		recorded into database; by default, items having date the same
-		or later than specified will be matched; if --before is set, 
-		then those having date before the specified; can be used with
+		recorded into database; items having date the same or later than
+		specified will be matched; if prepended by --not, then those having
+		date before the specified; can be used with
 		--read, --dump, --print-links, --mark
 -g, --categories=categories
--G, --no-categories=categories
-		match items that have (or have not) specified categories;
+		match items that have specified categories;
 		categories can be comma-separated list without whitespaces;
 		can be used with --read, --dump, --print-links, --mark
--x, --extra		
--X, --no-extra	say, whether to show extra item elements (i.e. that is not some
+-x, --show-extra		
+		show extra item elements (i.e. that is not some
 		of <title>, <link>, <pubDate>, <description>, <category>, or
-		<guid>); this is a reader (--read, --dump) option; the default
-		is --extra
+		<guid>); this is a reader (--read, --dump) option; extra elements
+		are shown by default - use this option with --not to disable
 -m, --marked=r|p|s|d
--M, --not-marked=r|p|s|d
-		match item(s) that are marked (not marked) by Read or Primary,
+		match item(s) that are marked by either Read or Primary,
 		or Secondary, or Delete mark; can be used with --read, --dump,
 		--print-links, --mark
 -f, --sort-field=ID|Link|Title|Description|PubDate|RecDate|GUID
 		specify a field selected items have to be sorted by; the default
 		is PubDate; can be used with --read, --dump, --print-links,
 		--mark
--o, --sort-asc
--O, --sort-desc	specify a sort order (ascending/descending); the default is
-		descending; can be used with --read, --dump, --print-links,
-		--mark
+-o, --asc-sort
+		set ascending sort order (the default is descending)
+		can be used with --read, --dump, --print-links, --mark
 -e, --tuple=num select only one item from all the multitude of items matching
 		the given parameters; num can be from 1 to number of items; can
 		be used with --read, --dump, --print-links, --mark
