@@ -368,6 +368,8 @@ int main (int argc, char **argv) {
 				sel.dbKeys = optarg; break;
 			case 'n':
 				inv = 1; break;
+			case 'C':
+				cs = 1; break;
 			case 'u':
 				set_link(); break;
 			case 'p':
