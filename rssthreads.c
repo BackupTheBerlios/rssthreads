@@ -101,7 +101,7 @@ int rss_thread (void *arg) {
 	for (interval = strtoul(sel->interval, NULL, 0); ; sleep(interval)) {
 		pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, NULL);
 
-		msg_verbose ("begin working with", sel->link, NULL);
+		msg_verbose (sel->table, ": transfer from", sel->link, "begin", NULL);
 		/* create XML parser and set up its callbacks */
 		if ( ! (parser = XML_ParserCreate (NULL))) 
 			msg_echo ("Cannot create parser", NULL);
@@ -129,7 +129,7 @@ int rss_thread (void *arg) {
 		XML_ParserFree (parser);
 		rssth_destroy_context (context);
 
-		msg_verbose ("end working with", sel->link,
+		msg_verbose (sel->table, ": transfer from", sel->link, "end",
 				"\n\tinterval:", sel->interval, "seconds.", NULL);
 		pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
 		pthread_testcancel();
@@ -143,6 +143,7 @@ int numthreads;
 void interrupt_handler (int sig) {
 	pthread_t *thread = threadsptr;
 	int i;
+	char i_str[10];
 	char *signame;
 	char buf[15];
 
@@ -157,11 +158,15 @@ void interrupt_handler (int sig) {
 			signame = buf; 
 			sprintf (buf, "signal %d", sig);
 	}
-	msg_verbose ("interrupted by", signame, NULL);
 
 	for (i = 0; i < numthreads; i++, thread++) {
+		sprintf (i_str, "%u", i);
+		msg_verbose ("cancelling thread", i_str, NULL);
 		pthread_cancel (*thread);
+		msg_verbose ("\tthread cancelled", NULL);
 	}	
+
+	msg_verbose ("interrupted by", signame, NULL);
 }
 
 int rssth_collect (struct selector *sel) {
@@ -198,7 +203,9 @@ int rssth_collect (struct selector *sel) {
 		pthread_sigmask (SIG_SETMASK, &set, &oset);
 
 		int i;
+		char i_str[10];
 		for (i = 0; i < ntuples; i++) {
+			sprintf (i_str, "%d", i);
 			th_sel[i] = *sel;
 			th_sel[i].id = PQgetvalue(res, i, 0);
 			th_sel[i].link = PQgetvalue(res, i, 1);
@@ -206,6 +213,8 @@ int rssth_collect (struct selector *sel) {
 			th_sel[i].interval = PQgetvalue(res, i, 3);
 
 			sleep (15);
+			msg_verbose ("starting thread for", th_sel[i].table, 
+					"; id =", i_str, NULL);
 			pthread_create (&thread[i], NULL,
 					(void *) &rss_thread, (void *) &th_sel[i]);
 		}
