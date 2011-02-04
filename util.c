@@ -55,6 +55,7 @@ char * concat (char *buf, ...) {
 	return buf;
 }
 
+#if 0 // not used
 int isnumstr (const char *str) {
 	char *ptr = str;
 	while (*ptr != '\0' && *ptr !='\n') {
@@ -63,6 +64,7 @@ int isnumstr (const char *str) {
 	}
 	return 1;
 }
+#endif
 
 int isncstr (const char *str) {
 	char *ptr = str;
@@ -74,12 +76,145 @@ int isncstr (const char *str) {
 	return 1;
 }
 
+#if 0 //not used
 char* termstr (const char *mem, int len) {
 	char *str = malloc (len + 1);
 	str = (char*) memcpy(str, mem, len);
 	*(str + len) = '\0';
 	return str;
 }
+#endif
+
+char * append (char **buf, const char *str) {
+	char *newbuf;
+
+	if (*buf) {
+		newbuf = malloc (strlen(*buf) + strlen(str) + 1);
+		strcpy (newbuf, *buf);
+		strcat (newbuf, str);
+		free (*buf);
+	} else {
+		newbuf = malloc (strlen(str) + 1);
+		strcpy (newbuf, str);
+	}
+
+	*buf = newbuf;
+	return *buf;
+}
+
+int obtain_table_name (char *table, PGconn *db, struct selector *sel) {
+	PGresult *res = NULL;
+
+	switch (sel->qualifier) {
+		case qlf_table:
+			strcpy (table, sel->table);
+			return 1;
+		case qlf_id:
+			if (sel->id2_auto) sel->id2 = NULL;
+			res = db_exec (db, "SELECT TableName FROM RSS WHERE ID = $1",
+					1, sel->id);
+			break;
+		case qlf_url:
+			if (sel->link2_auto) sel->link2 = NULL;
+			res = db_exec (db, "SELECT TableName FROM RSS WHERE URL = $1",
+					1, sel->link);
+			break;
+		case qlf_none:
+			msg_echo ("Neither table name, nor URL, nor ID was given.", NULL);
+			db_close (db);
+			return 0;
+	}
+
+	if (!res) {
+		db_close (db);
+		return 0;
+	}
+	
+	if (!PQntuples(res)) {
+		msg_echo ("Such feed was not found.", NULL);
+		PQclear (res);
+		db_close (db);
+		return 0;
+	}
+
+	strcpy (table, PQgetvalue(res, 0, 0));
+	PQclear (res);
+
+	return 1;
+}
+
+#if 0 /* crude so should not be used */
+int obtain_url (char **url, PGconn *db, struct selector *sel) {
+	PGresult *res = NULL;
+
+	if (!sel->link) {
+		if (sel->table) {
+			res = db_exec (db, "SELECT URL FROM RSS WHERE TableName = $1",
+					1, sel->table);
+		} else if (sel->id) {
+			if (sel->id2_auto) sel->id2 = NULL;
+			res = db_exec (db, "SELECT URL FROM RSS WHERE ID = $1",
+					1, sel->id);
+		} else {
+			msg_echo ("Neither table name, nor URL, nor ID was given.", NULL);
+			db_close (db);
+			return 0;
+		}
+
+		if (!res) {
+			db_close (db);
+			return 0;
+		}
+		
+		if (!PQntuples(res)) {
+			msg_echo ("Such feed was not found.", NULL);
+			PQclear (res);
+			db_close (db);
+			return 0;
+		}
+
+		*url = strdup (PQgetvalue(res, 0, 0));
+		PQclear (res);
+	} else {
+		if (sel->link2_auto) sel->link2 = NULL;
+		*url = strdup (sel->link);
+	}
+
+	return 1;
+}
+#endif
+
+#ifndef _GNU_SOURCE
+void * mempcpy (void *dest, const void *src, size_t n) {
+	memcpy (dest, src, n);
+	char *retval = (char *) dest + n;
+	return (void *) retval;
+} 
+#endif
+
+#if 0 //not used
+int translate_encoding (char *encoding) {
+	#define ENCQ (sizeof(encname) / sizeof(encname[0]))
+	unsigned int i;
+	int translated = 0;
+
+	msg_debug ("name translation for encoding:", encoding, NULL);
+
+	for (i = 0 ; i < ENCQ ; i++) {
+		if (!strcmp (encoding, encname[i].rss)) {
+			translated = 1;
+			encoding = encname[i].pg;
+			break;
+		}
+	}
+
+	msg_debug ("\tresulting encoding name:", encoding, NULL);
+
+	return translated;
+}
+#endif
+
+#ifdef RSS_TH
 
 int makestring (char **str, const char *mem, int len) {
 	char nbuf[20];
@@ -163,22 +298,9 @@ char * argz_last (const char *argz, size_t argz_len) {
 	return prev;
 }
 
-char * append (char **buf, const char *str) {
-	char *newbuf;
+#endif
 
-	if (*buf) {
-		newbuf = malloc (strlen(*buf) + strlen(str) + 1);
-		strcpy (newbuf, *buf);
-		strcat (newbuf, str);
-		free (*buf);
-	} else {
-		newbuf = malloc (strlen(str) + 1);
-		strcpy (newbuf, str);
-	}
-
-	*buf = newbuf;
-	return *buf;
-}
+#ifdef RSS_PG
 
 int get_screen_columns(void) {
 	char *cols;
@@ -384,88 +506,6 @@ void append_orderby_clause (char **sql,  struct selector *sel) {
 	append (sql, concat(buf, " ORDER BY ", sel->sortField, sortOrder, NULL));
 }
 
-int obtain_table_name (char *table, PGconn *db, struct selector *sel) {
-	PGresult *res = NULL;
-
-	switch (sel->qualifier) {
-		case qlf_table:
-			strcpy (table, sel->table);
-			return 1;
-		case qlf_id:
-			if (sel->id2_auto) sel->id2 = NULL;
-			res = db_exec (db, "SELECT TableName FROM RSS WHERE ID = $1",
-					1, sel->id);
-			break;
-		case qlf_url:
-			if (sel->link2_auto) sel->link2 = NULL;
-			res = db_exec (db, "SELECT TableName FROM RSS WHERE URL = $1",
-					1, sel->link);
-			break;
-		case qlf_none:
-			msg_echo ("Neither table name, nor URL, nor ID was given.", NULL);
-			db_close (db);
-			return 0;
-	}
-
-	if (!res) {
-		db_close (db);
-		return 0;
-	}
-	
-	if (!PQntuples(res)) {
-		msg_echo ("Such feed was not found.", NULL);
-		PQclear (res);
-		db_close (db);
-		return 0;
-	}
-
-	strcpy (table, PQgetvalue(res, 0, 0));
-	PQclear (res);
-
-	return 1;
-}
-
-#if 0 /* crude so should not be used */
-int obtain_url (char **url, PGconn *db, struct selector *sel) {
-	PGresult *res = NULL;
-
-	if (!sel->link) {
-		if (sel->table) {
-			res = db_exec (db, "SELECT URL FROM RSS WHERE TableName = $1",
-					1, sel->table);
-		} else if (sel->id) {
-			if (sel->id2_auto) sel->id2 = NULL;
-			res = db_exec (db, "SELECT URL FROM RSS WHERE ID = $1",
-					1, sel->id);
-		} else {
-			msg_echo ("Neither table name, nor URL, nor ID was given.", NULL);
-			db_close (db);
-			return 0;
-		}
-
-		if (!res) {
-			db_close (db);
-			return 0;
-		}
-		
-		if (!PQntuples(res)) {
-			msg_echo ("Such feed was not found.", NULL);
-			PQclear (res);
-			db_close (db);
-			return 0;
-		}
-
-		*url = strdup (PQgetvalue(res, 0, 0));
-		PQclear (res);
-	} else {
-		if (sel->link2_auto) sel->link2 = NULL;
-		*url = strdup (sel->link);
-	}
-
-	return 1;
-}
-#endif
-
 int select_tuple (char *table, struct selector *sel, PGconn* db, char *retbuf)
 {
 	PGresult *res;
@@ -509,33 +549,5 @@ void draw_vline(void) {
 	putchar ('\n');
 }
 
-#ifndef _GNU_SOURCE
-void * mempcpy (void *dest, const void *src, size_t n) {
-	memcpy (dest, src, n);
-	char *retval = (char *) dest + n;
-	return (void *) retval;
-} 
-#endif
 
-#if 0
-int translate_encoding (char *encoding) {
-	#define ENCQ (sizeof(encname) / sizeof(encname[0]))
-	unsigned int i;
-	int translated = 0;
-
-	msg_debug ("name translation for encoding:", encoding, NULL);
-
-	for (i = 0 ; i < ENCQ ; i++) {
-		if (!strcmp (encoding, encname[i].rss)) {
-			translated = 1;
-			encoding = encname[i].pg;
-			break;
-		}
-	}
-
-	msg_debug ("\tresulting encoding name:", encoding, NULL);
-
-	return translated;
-}
-	
 #endif

@@ -74,6 +74,68 @@ PGresult * db_exec (PGconn *db, const char *sql, unsigned int nParms, ...) {
 	return res;
 }
 
+void db_close (PGconn *db) {
+	msg_debug ("db_close()", NULL);
+	PQfinish (db);
+}
+
+#ifdef RSS_TH
+
+PGconn * db_open (rss_context context, const struct selector *sel) {
+	if (!sel->link && !sel->table) {
+		msg_echo ("Cannot operate when neither URL nor table was specified.",
+				NULL);
+		return (PGconn *) NULL;
+	}
+
+	//char *url = sel->link;
+	PGconn *db;
+	if (db = db_connect(sel)) {
+		context->db = db;
+		//PGresult *res;
+		//char *prefix = (char *) malloc (33);
+		//context->tablePrefix = prefix;
+		//char strbuf[LINE_MAX];
+
+#if 0	
+		if (!sel->prefix) {
+			res = db_exec (db,
+					"SELECT TablePrefix FROM RSS WHERE URL = $1", 1, url);
+			if (res) {
+				if (PQntuples (res)) {
+					strcpy (prefix, PQgetvalue (res, 0, 0));
+					PQclear (res);
+				} else {
+					db_close (db);
+					msg_echo ("RSS feed with URL", url,
+							"is not registered.", NULL);
+					db = (PGconn *) NULL;
+				}
+			} else {
+				msg_echo ("Database query error:", PQerrorMessage (db),
+						"\n\tURL:", url);
+				db_close (db);
+				db = (PGconn *) NULL;
+			}
+		} else {
+			strcpy (prefix, sel->prefix);
+		}
+
+		if (db) {
+			concat (strbuf, "INSERT INTO ",
+					prefix, "_Feed VALUES ($1, $2, $3, $4, $5)", NULL);
+			PQclear (PQprepare (db, "itemInsert", strbuf, 5, NULL));
+		}
+#endif
+
+	}
+	return db;
+}
+
+#endif
+
+#ifdef RSS_PG
+
 int db_create (const struct selector *sel) {
 	PGconn *db;
 	char *url = sel->link;
@@ -128,6 +190,29 @@ int db_create (const struct selector *sel) {
 	} else {
 		return 0;
 	}
+}
+
+int db_setup (void) {
+	PGconn *db;
+	if (db = PQsetdbLogin (NULL, NULL, NULL, NULL, NULL, NULL, NULL)) {
+		if (!db_exec (db, "CREATE SCHEMA rssthreads; "
+					"SET search_path TO rssthreads", 0))
+			return 0;
+		PGresult *res = db_exec (db, "CREATE TABLE RSS ("
+				"ID serial, "
+				"Active boolean NOT NULL DEFAULT true, "
+				"URL text NOT NULL UNIQUE, "
+				"Interval interval NOT NULL, "
+				"TableName NOT NULL varchar(32), "
+				"LastRecordDate timestamp(0) with time zone DEFAULT NULL, "
+				"Description text, "
+				"PRIMARY KEY (ID, URL)"
+				")", 0);
+		db_close (db);
+		return (int) res;
+	}
+	fprintf (stderr, "Database connection error: %s\n", PQerrorMessage(db));
+	return 0;
 }
 
 int db_info (struct selector *sel) {
@@ -275,81 +360,4 @@ int db_alter (struct selector *sel) {
 	return res ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-int db_setup (void) {
-	PGconn *db;
-	if (db = PQsetdbLogin (NULL, NULL, NULL, NULL, NULL, NULL, NULL)) {
-		if (!db_exec (db, "CREATE SCHEMA rssthreads; "
-					"SET search_path TO rssthreads", 0))
-			return 0;
-		PGresult *res = db_exec (db, "CREATE TABLE RSS ("
-				"ID serial, "
-				"Active boolean NOT NULL DEFAULT true, "
-				"URL text NOT NULL UNIQUE, "
-				"Interval interval NOT NULL, "
-				"TableName NOT NULL varchar(32), "
-				"LastRecordDate timestamp(0) with time zone DEFAULT NULL, "
-				"Description text, "
-				"PRIMARY KEY (ID, URL)"
-				")", 0);
-		db_close (db);
-		return (int) res;
-	}
-	fprintf (stderr, "Database connection error: %s\n", PQerrorMessage(db));
-	return 0;
-}
-
-PGconn * db_open (rss_context context, const struct selector *sel) {
-	if (!sel->link && !sel->table) {
-		msg_echo ("Cannot operate when neither URL nor table was specified.",
-				NULL);
-		return (PGconn *) NULL;
-	}
-
-	//char *url = sel->link;
-	PGconn *db;
-	if (db = db_connect(sel)) {
-		context->db = db;
-		//PGresult *res;
-		//char *prefix = (char *) malloc (33);
-		//context->tablePrefix = prefix;
-		//char strbuf[LINE_MAX];
-
-#if 0	
-		if (!sel->prefix) {
-			res = db_exec (db,
-					"SELECT TablePrefix FROM RSS WHERE URL = $1", 1, url);
-			if (res) {
-				if (PQntuples (res)) {
-					strcpy (prefix, PQgetvalue (res, 0, 0));
-					PQclear (res);
-				} else {
-					db_close (db);
-					msg_echo ("RSS feed with URL", url,
-							"is not registered.", NULL);
-					db = (PGconn *) NULL;
-				}
-			} else {
-				msg_echo ("Database query error:", PQerrorMessage (db),
-						"\n\tURL:", url);
-				db_close (db);
-				db = (PGconn *) NULL;
-			}
-		} else {
-			strcpy (prefix, sel->prefix);
-		}
-
-		if (db) {
-			concat (strbuf, "INSERT INTO ",
-					prefix, "_Feed VALUES ($1, $2, $3, $4, $5)", NULL);
-			PQclear (PQprepare (db, "itemInsert", strbuf, 5, NULL));
-		}
 #endif
-
-	}
-	return db;
-}
-
-void db_close (PGconn *db) {
-	msg_debug ("db_close()", NULL);
-	PQfinish (db);
-}

@@ -16,28 +16,60 @@
 CC = gcc -g
 SRC = rssthreads.c parser.c http.c db.c tools.c util.c rssthreads.h \
 		help.in rhelp.in
-OBJ = rssthreads.o parser.o http.o db.o tools.o util.o
+# OBJ = rssthreads.o parser.o http.o db.o tools.o util.o
+OBJ_TH = rssthreads.o parser.o http.o db_th.o util_th.o
+OBJ_PG = rsspg.o db_pg.o tools.o util_pg.o
 
-rssthreads: $(OBJ)
-	$(CC) -lexpat -lpq -lpthread -o rssthreads $(OBJ)
-rssthreads.o: rssthreads.c rssthreads.h help.h
-	$(CC) -c rssthreads.c
+
+all: rssthreads rsspg
+
+rssthreads: $(OBJ_TH)
+	$(CC) -lexpat -lpq -lpthread -o rssthreads $(OBJ_TH)
+
+rsspg: $(OBJ_PG)
+	$(CC) -lpq -o rsspg $(OBJ_PG)
+
+rssthreads.o: rssthreads.c rssthreads.h th_help.h
+	$(CC) -DRSS_TH -c rssthreads.c
+
+rsspg.o: rsspg.c rssthreads.h help.h
+	$(CC) -DRSS_PG -c rsspg.c
+
 parser.o: parser.c rssthreads.h encodings.h
-	$(CC) -c parser.c 
+	$(CC) -DRSS_TH -c parser.c 
+
 http.o: http.c rssthreads.h
-	$(CC) -c http.c
-db.o: db.c rssthreads.h
-	$(CC) -c db.c
+	$(CC) -DRSS_TH -c http.c
+
+db_pg.o: db.c rssthreads.h
+	$(CC) -DRSS_PG -o db_pg.o -c db.c
+
+db_th.o: db.c rssthreads.h
+	$(CC) -DRSS_TH -o db_th.o -c db.c
+
 tools.o: tools.c rssthreads.h rhelp.h
-	$(CC) -c tools.c
-util.o: util.c rssthreads.h
-	$(CC) -c util.c
+	$(CC) -DRSS_PG -c tools.c
+
+util_pg.o: util.c rssthreads.h 
+	$(CC) -DRSS_PG -o util_pg.o -c util.c
+
+util_th.o: util.c rssthreads.h 
+	$(CC) -DRSS_TH -o util_th.o -c util.c
+
 help.h: help.in
 	sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' \
 		-e '1s/^/\#define RSSTH_HELP "/' -e '2,$$s/^/"/' \
 		-e 's/$$/\\n" \\/' \
 		-e 's/	/\\t/' -e '$$s/ \\$$//' \
 		help.in >help.h
+
+th_help.h: th_help.in
+	sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' \
+		-e '1s/^/\#define RSSTH_HELP "/' -e '2,$$s/^/"/' \
+		-e 's/$$/\\n" \\/' \
+		-e 's/	/\\t/' -e '$$s/ \\$$//' \
+		th_help.in >th_help.h
+
 rhelp.h: rhelp.in
 	sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' \
 		-e '1s/^/\#define RSSTH_RHELP "/' -e '2,$$s/^/"/' \
@@ -46,4 +78,6 @@ rhelp.h: rhelp.in
 		rhelp.in >rhelp.h
 
 clean:
-	rm rssthreads *.o help.h rhelp.h
+	rm rsspg rssthreads *.o help.h rhelp.h th_help.h ; true
+
+.PHONY: all clean
