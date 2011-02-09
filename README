@@ -1,11 +1,12 @@
 RSS Threads
 ===========
 
-   rssthreads is a program that imports RSS channels from the Web to your
-   PostgreSQL database and has miscellaneous tools to process (view, list,
-   filter, mark, etc.) that recorded feeds. The word 'threads' in the name
-   is because each RSS channel runs cyclically in an individual program's
-   thread of control during the process of fetching and recording RSS.
+   rssthreads is a program suite that can be used to import RSS channels
+   from the Web to your PostgreSQL database and has miscellaneous tools
+   to process (view, list, filter, mark, etc.) that recorded feeds. The
+   word 'threads' in the name is because each RSS channel runs cyclically
+   in an individual program's thread of control during the process of
+   RSS aggregation.
 
    Originally, the primary goal in writing this piece of soft was to
    have such a tool helping to collect RSS the way that makes it possible
@@ -14,7 +15,12 @@ RSS Threads
    way to work with recorded feeds, from command line. So I think, this
    program can be used at least in two ways: a) as a command-line RSS
    aggregator/viewer; b) simultaneously with, say, web scripts processing
-   stuff collected by it in the database.
+   stuff being collected by it in the database.
+
+Protocols
+   
+   rssthreads tends to be compliant with RSS 2.0 protocol. I don't know,
+   whether it will work correctly with older versions of the protocol.
 
 Why PostgreSQL?
 
@@ -23,106 +29,22 @@ Why PostgreSQL?
       1) it is _completely_ free (in contrast to even MySQL that sticks to
          "dual licensing" policy);
 
-      2) it is Big and Clever (like an elephant :) ).
+      2) I use PostgreSQL for my personal database-related needs;
 
-Protocols
-   
-   rssthreads has been written with reference to RSS 2.0 protocol
-   specification. I don't know, whether it will work correctly with older
-   versions of the protocol.
-
-   It doesn't yet do HTTP redirections. Generally, if it receives a
-   HTTP response with header of type different from `200 OK', it just
-   outputs that whole header and dies (if there is several threads,
-   then just one thread dies; if there is a redirection header, you can take
-   link from it and substitute in place of your link in database).
-
-Database Layout
-
-   rssthreads _does not_ create new database. You give it all the parameters
-   it can connect with to the database server, including the database name,
-   and it creates a schema named `rssthreads' inside that database at
-   the first time (see PostgreSQL documentation in the `Data Definition'
-   chapter about schemas). If you haven't given the database name, the
-   default will take place (if any), otherwise you will get an error. This
-   applies to another connection parameters too: username, password, etc.
-
-   The main table has the name `RSS'. It contains information about every
-   RSS channel the program has to deal with, such as url and name of
-   the database table. Two tables relate to every channel: with names,
-   for example, CHANNEL1 and CHANNEL1_Categories. The second, that has
-   the suffix `_Categories', is a category index to filter RSS items by
-   the categories they belong to.
-
-   `RSS' database table structure with explanations follow.
-    
-   COLUMN           TYPE         EXPLANATION
-   ------           ----         -----------
-   ID               integer      unique channel ID
-   Active           boolean      wether the channel is active (i.e. subject
-                                 to be processed by program)
-   URL              text         channel's URL
-   Interval         interval     refresh interval
-   TableName        text         channel's database table name
-   LastRecordDate   timestamp(0) currently unused
-                    with time
-                    zone
-   Description      text         your description of this channel
-
-   Now, structure of individual channel's table. Each row contains a
-   single RSS item.
-
-   COLUMN           TYPE         EXPLANATION
-   ------           ----         -----------
-   ID               integer      unique item ID
-   Title            text         item title
-   Link             text         item link (url)
-   Description      text         item description (article)
-   PubDate          timestamp(0) item publication date (<pubDate> element)
-                    with time
-                    zone
-   RecDate          timestamp(0) item recording date (i.e. when it was
-                    with time    fetched to database)
-                    zone
-   GUID             text         item 'guid' field
-   Categories       text         comma-separated list of item categories
-   ExtraElements    text         all the other item elements separated by
-                                 newline
-   ReadMark         boolean      whether the item has been read
-   PrimaryMark      boolean      whether the item is marked by Primary mark
-   SecondaryMark    boolean      whether the item is marked by Secondary mark
-   DeleteMark       boolean      whether the item is marked for removal
-
-   Primary and Secondary marks do not have any special meaning. Think of
-   them as of bookmarks of two different types, and it's up to you how to
-   use and combine them. Deletion of the marked items is not implemented
-   yet in the toolset.
-
-   And finally, item categories index table.
-
-   COLUMN           TYPE         EXPLANATION
-   ------           ----         -----------
-   Item             integer      item ID (equal to ID in main table)
-   Category         text         item category
-
-Getting Help
-   
-   Manual page is absent for now. There is three sources of information:
-
-      1) this README;
-
-      2) program help called with `rssthreads --help' command;
-
-      3) reader help called by typing `h' and pressing Enter inside the
-         reader (which is fired up by `rssthreads --read' command - see
-         help).
+      3) it is Big and Clever (like an elephant :) ).
 
 Installation
 
-   The source package is not yet autoconf'ed. The only way to install
-   it is to run `make' and then, optionally, copy that sole useful file,
-   the executable named `rssthreads', into a preferable location.
-   
+   The source package is not yet autoconf'ed. To install it run
+   `make'. This will produce two binaries:
+      
+      rssthreads - actually, the aggregator;
+      rsspg - toolset for miscellaneous tasks.
+
+   Copy them into appropriate location. Also you can install into your
+   system manual path the manual pages for them, named rssthreads.1
+   and rsspg.1.
+
    Now, what's needed by this program to work. 
       
       1. Posix Threads library (libpthread), which usually comes with

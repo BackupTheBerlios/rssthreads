@@ -1,0 +1,207 @@
+.\" t
+.\"
+.\" Copyright (C) 2010-2011 Serge V. Baumer
+.\" 
+.\" This program is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, version 3 of the License.
+.\" 
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\" 
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+.TH RSSTHREADS 1 "Copyright \(co Serge V. Baumer" "RSS Threads" "RSS Threads"
+.SH NAME
+rssthreads \- POSIX-threaded RSS aggregator
+.SH SYNOPSIS
+.B rssthreads
+.BI [\-K|\-\-db\-keys= conninfo ]
+.BI [\-v|\-\-verbose= level ]
+.B [\-h|\-\-help]
+.SH DESCRIPTION
+.B rssthreads
+is a program importing specified to it RSS feeds from WWW
+to your PostgreSQL database.
+Each RSS channel is operated in separate thread.
+.SH PROTOCOLS
+This program
+was written with reference
+to RSS\ 2.0 protocol specification.
+I don't know whether it will work correctly with channels
+using older versions.
+.SH DATABASE LAYOUT
+.B rssthreads
+works with tables placed in a schema named \*(lqrssthreads\*(rq
+inside the database specified with
+.B \-\-db\-keys
+option or your PostgreSQL connection defaults.
+See PostgreSQL documentation
+in the \*(lqData Definition\*(rq chapter about schemas.
+See 
+.BR rsspg (1)
+for methods how the initial layout can be setup
+and how RSS channels can be added,
+without direct SQL operations, from command shell.
+.P
+The main table has the name \*(lqRSS\*(rq.
+It holds information about every single RSS channel
+the program has to deal with,
+such as URL, name of the database table,
+check interval, and so on.
+
+Every single RSS channel is represented by two tables.
+The first has name specified in
+\*(lqRSS\*(rq
+table for this channel.
+The second has name made of specified name
+and suffix \*(lq_Categories\*(rq.
+For example: \fTCHANNEL1\fP and \fTCHANNEL1_Categories\fP.
+The first is main table
+holding content of the RSS feed,
+and the second is a category index
+used when filtering RSS items by categories
+they belong to.
+.P
+\*(lqRSS\*(rq
+table has the following structure.
+.TS
+lb  lbw(12n)  lb
+- - -
+l  l  l.
+COLUMN	TYPE	EXPLANATION
+ID	integer	unique channel ID
+Active	boolean	T{
+whether the channel is active (i.e. subject to be processed by the program
+T}
+URL	text	channel's URL
+Interval	interval	refresh interval
+TableName	text	channel's table name
+LastRecordDate	T{
+timestamp(0) with time zone
+T}	currently unused
+Description	text	your description for this channel
+.TE
+.P
+Now, the structure of channel table.
+.TS
+lb lbw(12n) lb
+- - -
+l l l.
+COLUMN	TYPE	EXPLANATION
+ID	integer	unique item ID
+Title	text	item item title
+Link	text	item link
+Description	text	T{
+item description (or article)
+T}
+PubDate	T{
+timestamp(0) with time zone
+T}	item publication date
+RecDate	T{
+timestamp(0) with time zone
+T}	item recording date
+GUID	text	item 'guid' element
+Categories	text	T{
+comma\-separated list of item categories
+T}
+ExtraElements	text	T{
+all the other elements found in item, newline-separated
+T}
+ReadMark	boolean	T{
+true when item has been read
+T}
+PrimaryMark	boolean	primary mark
+SecondaryMark	boolean	secondary mark
+DeleteMark	boolean	T{
+true when item is marked for removal
+T}
+.TE
+.P
+Primary and Secondary marks do not have any special meaning.
+You can think of them as of bookmarks of two different types,
+and it's up to you how to use and combine them.
+.P
+And finally, item categories index table.
+.TS
+lb lbw(12n) lb
+- - -
+l l l.
+COLUMN	TYPE	EXPLANATION
+Item	integer	T{
+item ID (equal to ID in main table)
+T}
+Category	text	item category
+.TE
+.SH OPTIONS
+.TP
+.BI "\-K, \-\-db\-keys " conninfo
+Database connection settings.
+.I conninfo
+is a string consisting of a number of pairs
+.IB key = value
+separated by spaces.
+If
+.I value
+contains spaces
+it must be quoted by single quotes.
+Some possible keys:
+.RS
+.IP host 10
+database server host
+.IP port 10
+port number
+.IP dbname 10
+database name
+.IP user 10
+user name
+.IP password 10
+password.
+.P
+See documentation for
+.BR PQconnectdb ()
+function for more info
+(http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html).
+If you don't use this option,
+then your PostgreSQL connection defaults will be taken,
+if they are set correctly.
+Otherwise, an error will be occured.
+.RE
+.TP
+.BI "\-v, \-\-verbose " level
+Set verbosity level.
+.I level
+is one of:
+.RS
+.IP 0
+default
+.IP 1
+verbose
+.IP 2
+debug output
+.RE
+.TP
+.B \-h, \-\-help
+Display help and exit.
+.SH BUGS
+HTTP redirections are not yet implemented.
+Generally, if received HTTP response status
+is different from \*(lq200 OK\*(rq, 
+then the status line is output followed by all headers,
+and then the thread processing that channel cancels.
+So if there is redirection response you can take URL from
+.B Location:
+header printed and use it instead of URL used for this channel.
+.SH SEE ALSO
+.BR rsspg (1),
+.BR psql (1).
+.P
+.EX
+PostgreSQL Documentation
+(http://www.postgresql.org/docs/8.4/static/index.html)
+.EE
+.SH AUTHOR
+This manual page was written by Serge\ V.\ Baumer <baumer@users.berlios.de>.

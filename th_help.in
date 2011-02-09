@@ -1,20 +1,7 @@
 usage: %s [options]
 
-OPTIONS are:
+options:
+
 -K, --db-keys=conninfo
-        database connection settings; conninfo consists of a number of
-        pairs key=value separated by spaces; if the value contains spaces
-        it must be quoted by single quotes; some possible keys:
-        host       database server host
-        port       port number
-        dbname     database name
-        user       user name
-        password   password
-        see documentation for PQconnectdb() function for more info
-	(http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html)
--v, --verbose=num
-        set the verbosity level; num is one of:
-        0   default
-        1   verbose
-        2   debug
--h, --help	you have just used this option ;-)
+-v, --verbose=level
+-h, --help

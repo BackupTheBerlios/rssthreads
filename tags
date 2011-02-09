@@ -4,18 +4,21 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-CC	Makefile	/^CC = gcc -O0 -g$/;"	m
-LONGOPTS_INDEX	rssthreads.c	218;"	d	file:
-OBJ	Makefile	/^OBJ = rssthreads.o parser.o http.o db.o tools.o util.o$/;"	m
-RSSTH_DEFAULT_INTERVAL	rssthreads.h	35;"	d
-RSS_CONTEXT_SIZE	rssthreads.h	62;"	d
-RSS_ITEM_SIZE	rssthreads.h	50;"	d
-SRC	Makefile	/^SRC = rssthreads.c parser.c http.c db.c tools.c util.c rssthreads.h \\$/;"	m
+ENCMAPS_LENGTH	parser.c	58;"	d	file:
+LONGOPTS_INDEX	rsspg.c	23;"	d	file:
+LONGOPTS_INDEX	rssthreads.c	234;"	d	file:
+RSSTH_DEFAULT_INTERVAL	rssthreads.h	32;"	d
+RSS_CONTEXT_SIZE	rssthreads.h	160;"	d
+RSS_ITEM_SIZE	rssthreads.h	148;"	d
+SPARE_VALUE	parser.c	335;"	d	file:
+XML_ENCODING_MAP_SIZE	encodings.h	21;"	d
 _rssContext	rssthreads.h	/^typedef struct _rssContext \/* rss_context type definition *\/ {$/;"	s
 _rssItem	rssthreads.h	/^typedef struct _rssItem {$/;"	s
+_xmlEncodingMap	encodings.h	/^typedef struct _xmlEncodingMap {$/;"	s
+action_var	rsspg.c	/^} action_var;$/;"	t	typeref:enum:__anon1	file:
 action_var	rssthreads.c	/^} action_var;$/;"	t	typeref:enum:__anon2	file:
 active	rssthreads.h	/^	char *active;$/;"	m	struct:selector
-alter	rssthreads.c	/^	collect, setup, create, info, alter, drop, reader,$/;"	e	enum:__anon2	file:
+alter	rsspg.c	/^	setup, create, info, alter, drop, reader,$/;"	e	enum:__anon1	file:
 append	util.c	/^char * append (char **buf, const char *str) {$/;"	f
 appendAssignment	tools.c	318;"	d	file:
 append_flag	rssthreads.h	/^	unsigned char append_flag;		\/* some shit *\/$/;"	m	struct:_rssItem
@@ -25,19 +28,21 @@ append_mark	tools.c	/^void append_mark (char **sql, short mark, char *fieldname)
 append_orderby_clause	util.c	/^void append_orderby_clause (char **sql,  struct selector *sel) {$/;"	f
 append_where_clause	util.c	/^int append_where_clause (char **sql, struct selector *sel, const char* table) {$/;"	f
 argz_last	util.c	/^char * argz_last (const char *argz, size_t argz_len) {$/;"	f
-auto_set	rssthreads.c	284;"	d	file:
+auto_set	rsspg.c	88;"	d	file:
 before	rssthreads.h	/^	unsigned short before;			\/* before given date rather than from it *\/$/;"	m	struct:selector
-breakdown	rssthreads.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon2	file:
+breakdown	rsspg.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon1	file:
+breakdown	rssthreads.c	/^	collect, help, breakdown$/;"	e	enum:__anon2	file:
 browser	rssthreads.h	/^	char *browser;$/;"	m	struct:selector
 cats	rssthreads.h	/^	char *cats;							\/* argz vector of item's categories parsed *\/$/;"	m	struct:_rssItem
 cats	rssthreads.h	/^	char *cats;$/;"	m	struct:selector
 cats_len	rssthreads.h	/^	size_t cats_len;					\/* lenght of the above vector *\/$/;"	m	struct:_rssItem
 clear_item	parser.c	/^void clear_item (rss_item item) {$/;"	f
-collect	rssthreads.c	/^	collect, setup, create, info, alter, drop, reader,$/;"	e	enum:__anon2	file:
+collect	rssthreads.c	/^	collect, help, breakdown$/;"	e	enum:__anon2	file:
 concat	util.c	/^char * concat (char *buf, ...) {$/;"	f
-conditional_and	util.c	237;"	d	file:
+conditional_and	util.c	362;"	d	file:
 context	rssthreads.h	/^	struct _rssContext *context; 	\/* link to the item's context object *\/$/;"	m	struct:_rssItem	typeref:struct:_rssItem::_rssContext
-create	rssthreads.c	/^	collect, setup, create, info, alter, drop, reader,$/;"	e	enum:__anon2	file:
+create	rsspg.c	/^	setup, create, info, alter, drop, reader,$/;"	e	enum:__anon1	file:
+csflag	rsspg.c	125;"	d	file:
 db	rssthreads.h	/^	PGconn *db;						\/* database connection object *\/$/;"	m	struct:_rssContext
 dbKeys	rssthreads.h	/^	char *dbKeys;						\/* parameter to PQconnectdb() *\/$/;"	m	struct:selector
 db_alter	db.c	/^int db_alter (struct selector *sel) {$/;"	f
@@ -52,64 +57,74 @@ db_setup	db.c	/^int db_setup (void) {$/;"	f
 deleteMark	rssthreads.h	/^	short readMark, primaryMark, secondaryMark, deleteMark;$/;"	m	struct:selector
 description	rssthreads.h	/^	char *description;				\/* item's description parsed *\/$/;"	m	struct:_rssItem
 description	rssthreads.h	/^	char *description;$/;"	m	struct:selector
+description_cs	rssthreads.h	/^	char *description_cs;$/;"	m	struct:selector
+description_nomatch	rssthreads.h	/^	char *description_nomatch;$/;"	m	struct:selector
+description_nomatch_cs	rssthreads.h	/^	char *description_nomatch_cs;$/;"	m	struct:selector
 draw_vline	util.c	/^void draw_vline(void) {$/;"	f
-drop	rssthreads.c	/^	collect, setup, create, info, alter, drop, reader,$/;"	e	enum:__anon2	file:
-dump	rssthreads.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon2	file:
+drop	rsspg.c	/^	setup, create, info, alter, drop, reader,$/;"	e	enum:__anon1	file:
+dump	rsspg.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon1	file:
+encmaps	encodings.h	/^xmlEncodingMap encmaps[] = {$/;"	v
 error	rssthreads.h	/^	unsigned char error;				\/* error flag *\/$/;"	m	struct:_rssItem
 extra	rssthreads.h	/^	char *extra;						\/* the place for any extra elements parsed *\/$/;"	m	struct:_rssItem
-get_field	db.c	172;"	d	file:
+get_field	db.c	260;"	d	file:
 get_field	tools.c	107;"	d	file:
 get_screen_columns	util.c	/^int get_screen_columns(void) {$/;"	f
 guid	rssthreads.h	/^	char *guid;							\/* item's GUID *\/$/;"	m	struct:_rssItem
-help	rssthreads.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon2	file:
+help	rsspg.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon1	file:
+help	rssthreads.c	/^	collect, help, breakdown$/;"	e	enum:__anon2	file:
 hideExtra	rssthreads.h	/^	unsigned short hideExtra;	   \/* default is descending sort order *\/$/;"	m	struct:selector
 http_open	http.c	/^int http_open (const char *URL) {$/;"	f
 id	rssthreads.h	/^	char *id, *id2;$/;"	m	struct:selector
 id2	rssthreads.h	/^	char *id, *id2;$/;"	m	struct:selector
 id2_auto	rssthreads.h	/^	unsigned short id2_auto;		\/* whether id2 is auto-set from id *\/$/;"	m	struct:selector
-info	rssthreads.c	/^	collect, setup, create, info, alter, drop, reader,$/;"	e	enum:__anon2	file:
+info	rsspg.c	/^	setup, create, info, alter, drop, reader,$/;"	e	enum:__anon1	file:
 interrupt_handler	rssthreads.c	/^void interrupt_handler (int sig) {$/;"	f
 interval	rssthreads.h	/^	char *interval;$/;"	m	struct:selector
+invflag	rsspg.c	124;"	d	file:
 isncstr	util.c	/^int isncstr (const char *str) {$/;"	f
-isnumstr	util.c	/^int isnumstr (const char *str) {$/;"	f
 item	rssthreads.h	/^	rss_item item;					\/* item object (NULL when outside an item tag) *\/$/;"	m	struct:_rssContext
 lastRecDate	rssthreads.h	/^	time_t lastRecDate;			\/* time of previous RSS capturing *\/$/;"	m	struct:_rssContext
 link	rssthreads.h	/^	char *link, *link2;$/;"	m	struct:selector
 link	rssthreads.h	/^	char *link;							\/* item's link parsed *\/$/;"	m	struct:_rssItem
 link2	rssthreads.h	/^	char *link, *link2;$/;"	m	struct:selector
 link2_auto	rssthreads.h	/^	unsigned short link2_auto;		\/* like with id *\/$/;"	m	struct:selector
-links	rssthreads.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon2	file:
+links	rsspg.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon1	file:
+longopts	rsspg.c	/^static const struct option longopts[] = {$/;"	v	typeref:struct:option	file:
 longopts	rssthreads.c	/^static const struct option longopts[] = {$/;"	v	typeref:struct:option	file:
+main	rsspg.c	/^int main (int argc, char **argv) {$/;"	f
 main	rssthreads.c	/^int main (int argc, char **argv) {$/;"	f
-make_field	parser.c	63;"	d	file:
+make_field	parser.c	90;"	d	file:
 makestring	util.c	/^int makestring (char **str, const char *mem, int len) {$/;"	f
-mark	rssthreads.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon2	file:
-markSet	rssthreads.h	/^	char *markSet;						\/* argument of the '--mark' action *\/$/;"	m	struct:selector
+map	encodings.h	/^	int  map[256];$/;"	m	struct:_xmlEncodingMap
+mark	rsspg.c	/^	dump, links, mark, breakdown, help$/;"	e	enum:__anon1	file:
+markSet	rssthreads.h	/^	char *markSet;						\/* argument of '--mark' action *\/$/;"	m	struct:selector
 mark_item	tools.c	109;"	d	file:
 mempcpy	util.c	/^void * mempcpy (void *dest, const void *src, size_t n) {$/;"	f
-msg_debug	rssthreads.h	110;"	d
+msg_debug	rssthreads.h	71;"	d
 msg_echo	util.c	/^void msg_echo (const char *begin, ...) {$/;"	f
-msg_verbose	rssthreads.h	109;"	d
+msg_verbose	rssthreads.h	70;"	d
+name	encodings.h	/^	char *name;$/;"	m	struct:_xmlEncodingMap
 noCats	rssthreads.h	/^	char *noCats;$/;"	m	struct:selector
 numthreads	rssthreads.c	/^int numthreads;$/;"	v
 obtain_table_name	util.c	/^int obtain_table_name (char *table, PGconn *db, struct selector *sel) {$/;"	f
-parse_optarg	rssthreads.c	304;"	d	file:
+parse_optarg	rsspg.c	108;"	d	file:
 parse_time	util.c	/^time_t parse_time (const char *timestr) {$/;"	f
 parser	rssthreads.h	/^	XML_Parser parser;			\/* current parser *\/$/;"	m	struct:_rssContext
 pos	rssthreads.h	/^	int pos;							\/* position in the XML stack *\/$/;"	m	struct:_rssContext
 prev	rssthreads.h	/^	struct _rssContext *prev;	\/* link to previous stack element *\/$/;"	m	struct:_rssContext	typeref:struct:_rssContext::_rssContext
 primaryMark	rssthreads.h	/^	short readMark, primaryMark, secondaryMark, deleteMark;$/;"	m	struct:selector
 print_links	tools.c	/^int print_links (struct selector *sel) {$/;"	f
+progname	rsspg.c	/^const char *progname;$/;"	v
 progname	rssthreads.c	/^const char *progname;$/;"	v
 pubDate	rssthreads.h	/^	char *pubDate;						\/* item's publication date parsed *\/$/;"	m	struct:_rssItem
 pubDate	rssthreads.h	/^	char *pubDate;$/;"	m	struct:selector
-qlf_id	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	e	enum:selector::__anon1
-qlf_none	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	e	enum:selector::__anon1
-qlf_table	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	e	enum:selector::__anon1
-qlf_url	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	e	enum:selector::__anon1
-qualifier	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	m	struct:selector	typeref:enum:selector::__anon1
+qlf_id	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	e	enum:selector::__anon3
+qlf_none	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	e	enum:selector::__anon3
+qlf_table	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	e	enum:selector::__anon3
+qlf_url	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	e	enum:selector::__anon3
+qualifier	rssthreads.h	/^	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;$/;"	m	struct:selector	typeref:enum:selector::__anon3
 readMark	rssthreads.h	/^	short readMark, primaryMark, secondaryMark, deleteMark;$/;"	m	struct:selector
-reader	rssthreads.c	/^	collect, setup, create, info, alter, drop, reader,$/;"	e	enum:__anon2	file:
+reader	rsspg.c	/^	setup, create, info, alter, drop, reader,$/;"	e	enum:__anon1	file:
 recDate	rssthreads.h	/^	char *recDate;$/;"	m	struct:selector
 record_item	parser.c	/^int record_item (const rss_item item) {$/;"	f
 rss_cdata	parser.c	/^void XMLCALL rss_cdata(void *data, const char *str, int len) {$/;"	f
@@ -118,6 +133,7 @@ rss_context	rssthreads.h	/^} *rss_context;$/;"	t	typeref:struct:_rssContext
 rss_item	rssthreads.h	/^} *rss_item;$/;"	t	typeref:struct:_rssItem
 rss_opentag	parser.c	/^void XMLCALL rss_opentag(void *data, const char *element, const char **attributes) {$/;"	f
 rss_thread	rssthreads.c	/^int rss_thread (void *arg) {$/;"	f
+rss_unknown_enc	parser.c	/^int XMLCALL rss_unknown_enc (void *data, const char *name,$/;"	f
 rss_xml	parser.c	/^void XMLCALL rss_xml (void *data, const XML_Char *version,$/;"	f
 rssth_collect	rssthreads.c	/^int rssth_collect (struct selector *sel) {$/;"	f
 rssth_create_context	rssthreads.c	/^rss_context rssth_create_context (rss_context prev) {$/;"	f
@@ -125,29 +141,35 @@ rssth_destroy_context	rssthreads.c	/^void rssth_destroy_context (rss_context con
 rssth_get	rssthreads.c	/^int rssth_get (rss_context context) {$/;"	f
 rssth_http_mutex	http.c	/^pthread_mutex_t rssth_http_mutex = PTHREAD_MUTEX_INITIALIZER;$/;"	v
 rssth_read	tools.c	/^int rssth_read (struct selector *sel, unsigned short dump) {$/;"	f
+rssth_verbose	rsspg.c	/^unsigned short rssth_verbose = 0;$/;"	v
 rssth_verbose	rssthreads.c	/^unsigned short rssth_verbose = 0;$/;"	v
 secondaryMark	rssthreads.h	/^	short readMark, primaryMark, secondaryMark, deleteMark;$/;"	m	struct:selector
 sel	rssthreads.h	/^	struct selector *sel;		\/* selector structure (defined below) *\/$/;"	m	struct:_rssContext	typeref:struct:_rssContext::selector
 select_tuple	util.c	/^int select_tuple (char *table, struct selector *sel, PGconn* db, char *retbuf)$/;"	f
 selector	rssthreads.h	/^struct selector \/* multi-purpose selection structure *\/ {$/;"	s
-set_action	rssthreads.c	281;"	d	file:
-set_id	rssthreads.c	293;"	d	file:
-set_link	rssthreads.c	294;"	d	file:
-set_mark	rssthreads.c	312;"	d	file:
+set_action	rsspg.c	85;"	d	file:
+set_action	rssthreads.c	263;"	d	file:
+set_id	rsspg.c	97;"	d	file:
+set_link	rsspg.c	98;"	d	file:
+set_mark	rsspg.c	116;"	d	file:
 set_marks	tools.c	/^int set_marks (struct selector *sel) {$/;"	f
 set_parser_callbacks	parser.c	/^void set_parser_callbacks(XML_Parser parser) {$/;"	f
-set_qualifier	rssthreads.c	282;"	d	file:
-set_table	rssthreads.c	295;"	d	file:
-setup	rssthreads.c	/^	collect, setup, create, info, alter, drop, reader,$/;"	e	enum:__anon2	file:
+set_qualifier	rsspg.c	86;"	d	file:
+set_table	rsspg.c	99;"	d	file:
+setup	rsspg.c	/^	setup, create, info, alter, drop, reader,$/;"	e	enum:__anon1	file:
 sortField	rssthreads.h	/^	char *sortField;$/;"	m	struct:selector
 sortForward	rssthreads.h	/^	unsigned short sortForward;	\/* default is descending sort order *\/$/;"	m	struct:selector
 table	rssthreads.h	/^	char *table, *table2;$/;"	m	struct:selector
 table2	rssthreads.h	/^	char *table, *table2;$/;"	m	struct:selector
 table2_auto	rssthreads.h	/^	unsigned short table2_auto;  \/* like with id *\/$/;"	m	struct:selector
 tagName	rssthreads.h	/^	char *tagName;					\/* tag name *\/$/;"	m	struct:_rssContext
-termstr	util.c	/^char* termstr (const char *mem, int len) {$/;"	f
 threadsptr	rssthreads.c	/^pthread_t *threadsptr;$/;"	v
 title	rssthreads.h	/^	char *title;						\/* item's title parsed *\/$/;"	m	struct:_rssItem
 title	rssthreads.h	/^	char *title;$/;"	m	struct:selector
+title_cs	rssthreads.h	/^	char *title_cs;$/;"	m	struct:selector
+title_nomatch	rssthreads.h	/^	char *title_nomatch;$/;"	m	struct:selector
+title_nomatch_cs	rssthreads.h	/^	char *title_nomatch_cs;$/;"	m	struct:selector
+try_insert	parser.c	/^void try_insert (PGconn *db, char *table, char* id, char *field, char *value, char *spare) {$/;"	f
 tuple	rssthreads.h	/^	char *tuple;$/;"	m	struct:selector
 word_wrap	util.c	/^char * word_wrap (char **str) {$/;"	f
+xmlEncodingMap	encodings.h	/^} xmlEncodingMap;$/;"	t	typeref:struct:_xmlEncodingMap

@@ -1,0 +1,552 @@
+.\"
+.\" Copyright (C) 2010-2011  Serge V. Baumer
+.\" 
+.\" This program is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, version 3 of the License.
+.\" 
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\" 
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+.TH RSSPG 1 "Copyright \(co Serge V. Baumer" "RSS Threads" "RSS Threads"
+.SH NAME
+rsspg \- rssthreads tool set
+.SH SYNOPSIS
+.HP 
+.B rsspg
+[ACTION] [PARAMETER] ...
+.SH DESCRIPTION
+.B rsspg
+is a utility program for
+.BR rssthreads (1)
+designed to perform miscellaneous tasks
+usually concerning database operations.
+Such as: initial database setup,
+creating individual RSS channel tables,
+reading, marking and deleting recorded RSS items,
+and so on.
+.SH OPTIONS
+All
+.B rsspg
+options 
+are divided into two main groups:
+.IR actions\  and\ action\  parameters .
+If you use option in long form with argument,
+you concatenate them using equal sign without spaces (e.g.
+.IR \-\-id=123 ).
+.SS Actions
+Some of these options can take arguments that otherwise could be set
+by further
+.I parameter
+options.
+In such case, if a
+.I parameter
+option setting a value already set by an
+.I action
+option is nevertheless used, it can have different meaning.
+If it doesn't have, it is just ignored.
+See
+.B Parameters
+section for more details.
+.TP
+.B \-s, \-\-setup
+Initialize database for RSSThreads to work with
+(create schema and main table).
+This is the first action to be performed
+after package installation.
+Created schema name will be `rssthreads'.
+See
+.BR rssthreads (1)
+for details about database organization.
+This action can accept 
+.B \-\-db\-keys
+parameter.
+.TP
+.BI "\-c, \-\-create " [url|tablename]
+Register new RSS channel for processing and create it's tables.
+Table name or URL can be set.
+URL must be specified either here or by parameter.
+Table name can be generated automatically from new channel ID
+by prefixing it with \*(lqRSS\*(rq prefix (e.g.
+.IR RSS123 ).
+Possible parameters:
+.BR \-\-url , " \-\-table" , " \-\-interval" .
+.TP
+.BI "\-i, \-\-info " [id|url|tablename]
+If an RSS channel ID, URL, or table name is specified someway,
+show info on that channel.
+Otherwise show list of all channels.
+This is the default action.
+Possible parameters:
+.BR \-\-id ,\  \-\-url ,\  \-\-table .
+.TP
+.BI "\-a, \-\-alter " [id|url|tablename]
+Change attributes (URL, interval, active state)
+of a channel specified by ID, URL or table name.
+Possible parameters:
+.BR \-\-id ,\  \-\-url ,\  \-\-table ,\  \-\-interval ,\  \-\-active .
+.TP
+.BI "\-d, \-\-drop " [id|url|tablename] "\ \ \ !!!DANGEROUS!!!"
+Completely forget RSS channel specified by ID, URL or table name
+and remove it's record and tables from the database.
+Possible parameters:
+.BR \-\-id ,\  \-\-url ,\  \-\-table .
+.TP
+.BI "-r, --read " [id|url|tablename]
+Start simple terminal reader for channel
+specified by ID, URL or table name.
+See
+.B READER
+section below.
+Possible parameters:
+.BR \-\-id ,\  \-\-url ,\  \-\-table ,\  \-\-browser ,
+.BR \-\-show-extra ,\  \-\-sort-field ,\  \-\-asc-sort
+and also all filter parameters (see below)
+to select items to view.
+.TP
+.BI "\-P, \-\-dump " [id|url|tablename]
+Output items of a channel specified by ID, URL or table name.
+It looks like reader, but without stop and command prompt.
+Possible parameters:
+.BR \-\-id ,\  \-\-url ,\  \-\-table ,
+.BR \-\-show-extra ,\  \-\-sort-field ,\  \-\-asc-sort
+and also all filter parameters (see below)
+to select items to dump.
+.TP
+.BI "\-L, \-\-print\-links " [id|url|tablename]
+Print items links in a channel specified by ID, URL or table name.
+Possible parameters:
+.BR \-\-id ,\  \-\-url ,\  \-\-table 
+and also all filter parameters (see below)
+to select items to print links of.
+.TP
+.BI "\-F, \-\-mark " string
+Set marks on items in a channel specified by ID, URL or table name.
+.I string
+is continuous string consisting of any number of
+one-letter commands to set or clear particular marks.
+The commands a the same as in reader. See
+.B READER
+section below.
+Possible parameters:
+.BR \-\-id ,\  \-\-url ,\  \-\-table
+and also all filter parameters (see below)
+to select items to set marks on.
+.TP
+.B \-h, \-\-help
+Display help and exit.
+This action does not accept any parameters.
+.P
+All the actions (except
+.BR \-\-help )
+accept
+.B --verbose
+parameter beyound others.
+.SS Parameters
+Many of the parameters listed below can have different meaning
+depending on following three conditions:
+.IP \- 3
+the action the parameter is being used for;
+.IP \- 3
+whether the action option has an argument;
+.IP \- 3
+the parameter's position among others.
+.P
+Any action able to have parameters (except
+.BR \-\-setup ) 
+first needs specification
+of some particular RSS channel to deal with.
+The channel can be specified in three ways:
+by its URL; by name of its main table in database
+(this name too can be taken as a unique channel identifier);
+and, finally, by its unique ID in main database table named \*(lqRSS\*(rq
+(of course, this type of specification is possible
+only when the channel is already registered in database using
+.BR \-\-create\  option).
+So, the very first specification of any of these three things
+in command line (no matter, in action or in parameter)
+is treated as a specification of an RSS channel.
+All the subsequent specifications take sense depending on action.
+.P
+Theoretically, all parameters can be arranged into three groups:
+channel specifying parameters (explained above),
+configuration parameters and filter parameters
+(filtering of RSS items is meant).
+There is several parameters that, again,
+depending on action and their place, 
+can belong to either one or another group.
+.P
+.B Channel specifying parameters:
+(when not specified by the action argument)
+--url,
+--link,
+--table,
+--id.
+.P
+.B Configuration parameters:
+--not,
+--db-keys,
+--active,
+--url,
+--link,
+--interval,
+--description,
+--extra,
+--sort-field,
+--asc-sort,
+--browser,
+--verbose.
+.P
+.B Filter parameters:
+--not,
+--case,
+--url,
+--link,
+--id,
+--title,
+--description,
+--pub-from,
+--rec-from,
+--categories,
+--marked,
+--tuple.
+.TP
+.BI "\-K, \-\-db\-keys " conninfo
+Database connection settings.
+.I conninfo
+is a string consisting of a number of pairs
+.IB key = value
+separated by spaces.
+If
+.I value
+contains spaces
+it must be quoted by single quotes.
+Some possible keys:
+.RS
+.IP host 10
+database server host
+.IP port 10
+port number
+.IP dbname 10
+database name
+.IP user 10
+user name
+.IP password 10
+password.
+.P
+See documentation for
+.BR PQconnectdb ()
+function for more info
+(http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html).
+If you don't use this option,
+then your PostgreSQL connection defaults will be taken,
+if they are set correctly.
+Otherwise, an error will be occured.
+.RE
+.TP
+.B -n, --not
+Inverts meaning of the next parameter,
+or the first parameter among subsequent ones
+that permits such inversion.
+Those parameters are 
+.BR \-\-active ,
+.BR \-\-title ,
+.BR \-\-description ,
+.BR \-\-pub\-from ,
+.BR \-\-rec\-from ,
+.BR \-\-categories ,
+.BR \-\-extra ,
+.BR \-\-marked\  and
+.BR \-\-asc\-sort .
+.TP
+.B \-C, \-\-case
+Says that pattern matching must be case sensitive.
+Affects the first (only) occurence of
+.BR \-\-title\  or\  \-\-description
+parameter (in
+.B Filter
+meaning ) among subsequent ones.
+.TP
+.B \-A, \-\-active
+Set channel to be active
+(i.e. assigned to be processed by aggregator
+rather than just hold it's place in database).
+Used with
+.BR \-\-alter .
+All new channels are active by default.
+.TP
+.BI "\-u, \-\-url " link
+.TQ
+.BI "\-l, \-\-link " link
+.RS
+.P
+.B Channel:
+Specify an RSS channel by URL.
+.P
+.B Configuration:
+Set the RSS channel's URL to 
+.IR link .
+.RB (Actions:\  \-\-create ,\  \-\-alter ).
+.P
+.B Filter:
+Match RSS item whose link is
+.IR link .
+.RE
+.TP
+.BI "\-p, \-\-table " tablename
+.RS
+.P
+.B Channel:
+Specify an RSS channel by URL.
+.PP
+.B Configuration:
+Set RSS channel's table name to
+.IR table .
+.RB (Actions:\  \-\-create ,\  \-\-alter ).
+.RE
+.TP
+.BI "\-I, \-\-id " ID [, ID... ]
+.RS
+.P
+.B Channel:
+Specify an RSS channel by ID.
+.P
+.B Filter:
+Match item(s) with these ID(s).
+.RE
+.TP
+.BI "\-n, \-\-interval " interval
+set interval between single channel transfers (downloads);
+.I interval
+is in the form of number of seconds, or \*(lqhh:mm:ss\*(rq,
+or any form possible for PostgreSQL
+.B interval
+data type.
+.RB (Actions:\  \-\-create ,\  \-\-alter ).
+.TP
+.BI "\-T, \-\-description " string
+.RS
+.P
+.B Configuration:
+Give RSS channel description.
+.RB (Actions:\  \-\-create ,\  \-\-alter ).
+.P
+.B Filter:
+Match RSS items whose description field matches the regular expression
+.IR string .
+.RE
+.TP
+.BI "\-t, \-\-title " regexp
+Match RSS items whose title matches the regular expression
+.IR regexp .
+.TP
+.BI "\-U, \-\-pub\-from " date
+Match RSS items having the publication date the same or later than
+.IR date .
+If this option is inverted by
+.BR \-\-not ,
+match items having the date earlier than
+.IR date .
+.I date
+can include time and is in form suitable for PostgreSQL
+.B timestamp
+data type.
+.TP
+.BI "\-R, \-\-rec\-from " date
+Match RSS items having record date
+(the date when they have been recorded into the database)
+the same or later than
+.IR date .
+If this option is inverted by
+.BR \-\-not ,
+match items having the date earlier than
+.IR date .
+.I date
+can include time and is in form suitable for PostgreSQL
+.B timestamp
+data type.
+.TP
+.BI "\-g, \-\-categories " category [, category... ]
+Match RSS items that have specified category (categories).
+.TP
+.B \-m, \-\-marked r|p|s|d
+Match RSS items that are marked by either
+.RB Read\ ( r )
+.RB or\ Primary\ ( p ),
+.RB or\ Secondary\ ( s ),
+.RB or\ Delete\ ( d )
+mark.
+.TP
+.BI "\-f, \-\-sort\-field " field
+Sort output RSS items by
+.IR field .
+Fields are:
+.BR ID ,
+.BR Link ,
+.BR Title ,
+.BR Description ,
+.BR PubDate ,
+.BR RecDate ,
+.BR GUID .
+The default is
+.BR PubDate .
+(Actions:
+.BR \-\-read ,
+.BR \-\-dump ,
+.BR \-\-print\-links ,
+.BR \-\-mark ).
+.TP
+.B "\-o, \-\-asc\-sort "
+Use ascending sort order (the default is descending).
+(Actions:
+.BR \-\-read ,
+.BR \-\-dump ,
+.BR \-\-print\-links ,
+.BR \-\-mark ).
+.TP
+.BI "\-e, \-\-tuple " number
+Select only one RSS item 
+from all the multitude of items matching given filter,
+sorted and ready to output.
+.I number
+is not an ID but position,
+from 1 to number of items in the prepared set.
+(Actions:
+.BR \-\-read ,
+.BR \-\-dump ,
+.BR \-\-print\-links ,
+.BR \-\-mark ).
+.TP
+.BI "\-B, \-\-browser " cmdline
+Set command line the browser program must be started with from
+the reader.
+.I cmdline
+must contain 
+.B %s
+pattern at the place where RSS item link is to be inserted.
+This parameter overrides
+.B RSSTH_BROWSER
+environment variable.
+The default commandline is \*(lqlynx %s\*(rq.
+.TP
+.BI "\-v, \-\-verbose " number
+Set verbosity level.
+.I number
+is one of:
+.RS
+.IP 0
+default
+.IP 1
+verbose
+.IP 2
+debug output
+.RE
+.SH READER
+Reader that can be started with
+.B rsspg --read
+command is tty-style reader.
+RSS items go sequentially one-by-one.
+After each item displayed,
+the program and displays command prompt and waits for input.
+.SS Item Representation
+.EX
+[ \fIID\fP ] \fItitle\fP
+
+DATE: \fIpublication date\fP
+CATEGORIES: \fIlist of categories\fP
+\fIlink\fP
+
+\fIdescription\fP
+
+GUID: \fI<guid> element\fP
+\fIextra elements in form \*(lqname: content\*(rq (optional)\fP
+
+MARKS: \fImarks if any\fP
+\fIrecording_date\fP   \fIitem_position\fP/\fInumber_of_items\fP
+: \fI(command prompt)\fP
+.EE
+.SS Commands
+First, you can simply press
+.I Enter
+on command prompt to proceed to the next item.
+Command line consists of any number of commands.
+Single command represented by single letter
+(case is taken into account).
+Spaces are ignored.
+After you press
+.I Enter
+commands are executed in turn from left to right,
+and then the next item will be printed.
+.IP r
+Set Read mark.
+Item is marked read automatically
+when you proceed to the next item.
+.IP R
+Unset Read mark.
+.IP p
+Set Primary mark.
+.IP P
+Unset Primary mark.
+.IP s
+Set Secondary mark.
+.IP P
+Unset Secondary mark.
+.IP d
+Mark the item for deletion.
+.IP D
+Unset Delete mark.
+.IP \-
+Go one item backward.
+.IP +
+Jump over one item forward (first time);
+go one item forward (next times).
+.IP b
+Start browser program with current item link as a parameter.
+.IP h
+Display help.
+.IP Q
+Quit from reader.
+.P
+Commands can be repeated multiple times in one line
+(this is useful for 
+.B +
+and
+.B \-
+commands). 
+Primary and Secondary marks do not have any special meaning.
+You can think of them as of bookmarks of two different types,
+and it's up to you how to use and combine them. 
+.SH ENVIRONMENT
+.TP
+RSSTH_BROWSER
+Sets browser command line. See description for
+.B \-\-browser
+command above.
+.SH BUGS
+There is no way for now to delete marked items
+(by Delete mark) using this program afterwards.
+The way to do this is to issue a SQL query
+of form
+.P
+.EX
+DELETE FROM rssthreads.<table_name> WHERE DeleteMark IS true
+.EE
+.P
+in, for example,
+.BR psql (1)
+program.
+.SH SEE ALSO
+.BR rssthreads (1),
+.BR psql (1).
+.P
+.EX
+PostgreSQL Documentation
+(http://www.postgresql.org/docs/8.4/static/index.html)
+.EE
+.SH AUTHOR
+This manual page was written by Serge\ V.\ Baumer <baumer@users.berlios.de>.

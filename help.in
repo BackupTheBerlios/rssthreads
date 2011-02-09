@@ -1,128 +1,38 @@
-usage: %s [action [parameters]]
+usage: %s [action] [parameter] ...
 
-ACTIONS are:
+actions:
 
--s, --setup	initialize database for RSSThreads to work with (create schema
-        and main table); the first action to be performed; schema name
-        is `rssthreads'
--c, --create[=url|tablename] parameter(s)
-        register new RSS channel and create it's tables; needs url and,
-        optionally, table name and interval to be specified
--i, --info[=id|url|tablename] [parameter]
-        display info on a some registered RSS channel, or list of all
-        channels (if none is specified by the ID, URL or table name)
-        This is the default action.
--a, --alter[=id|url|tablename] parameter(s)
-        change attributes (url, interval, active state) of a some
-        channel
--d, --drop[=id|url|tablename] [parameter]  !DANGEROUS!
-        remove channel's record and tables from the database
--r, --read[=id|url|tablename] [parameter(s)]
-        read channel's items on terminal one-by-one; type `h' and press
-        Enter inside the reader to know how to use it
--P, --dump[=id|url|tablename] [parameter(s)]
-        dump channel's items to the terminal (non-stop "reader")
--L, --print-links[=id|url|tablename] [parameter(s)]
-        just list links of channel's items to terminal
--F, --mark=<any combination of r,R,p,P,s,S,d,D without any delimiters>
-[parameter(s)]
-        set/unset marks on items with one-letter commands which are:
-        r/R	set/unset Read mark
-        p/P	set/unset Primary mark
-        s/S	set/unset Secondary mark
-        d/D	set/unset Delete mark
--h, --help	you have just used this option ;-)
+-s, --setup	
+-c, --create=[url|tablename]
+-i, --info=[id|url|tablename]
+-a, --alter=[id|url|tablename]
+-d, --drop=[id|url|tablename]  !DANGEROUS!
+-r, --read=[id|url|tablename]
+-P, --dump=[id|url|tablename]
+-L, --print-links=[id|url|tablename]
+-F, --mark=r|R|p|P|s|S|d|D[r|R|p|P|s|S|d|D]...
+-h, --help
 
-PARAMETERS: Parameters mainly serve to specify objects (whole RSS channels or
-particular items in a channel), or some characteristics of objects on that
-action has to be performed. If action implies a channel to be specfied,
-the very first specification of id or url or table name is taken for this (it
-may be the argument of action or --id, --url or --table parameters). All the
-rest are used to specify new attributes (e.g. for --create or --alter), items
-characteristics (e.g. to select items to read with --read, --dump), etc.
+parameters:
+
 -K, --db-keys=conninfo
-        database connection settings; conninfo consists of a number of
-        pairs key=value separated by spaces; if the value contains spaces
-        it must be quoted by single quotes; some possible keys:
-        host       database server host
-        port       port number
-        dbname     database name
-        user       user name
-        password   password
-        see documentation for PQconnectdb() function for more info
-	(http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html)
 -n, --not
-        inverts meaning of the next option (or the first option among subsequent
-        ones, that permits such inversion); actual with --active, --title,
-        --description, --pub-from, --rec-from, --categories, --extra, --marked,
-        and --asc-sort
 -C, --case
-        says that pattern matching must be case sensitive;
-        affects the first (only) occurence of --title or --description option
-        among subsequent ones
 -A, --active
-        set channel to be active (i.e. assigned to be processed by
-        aggregator rather than just hold it's place in database); used
-        with --alter; all new channels are active by default
 -u, --url=link
--l, --link=link	set/specify link (url); can be used with --create, --info,
-        --alter, --drop (channel's link), --read, --dump, --print-links,
-        --mark (both channel's and/or item's links; items' links can be
-        listed using commas without whitespace); this two options are
-        just identical
+-l, --link=link
 -p, --table=tablename
-        set/specify channel's database table name; tablename can't be
-        longer than 32 symbols; can be used with all the actions
 -n, --interval=interval
-        set interval between single channel transactions (downloads);
-        interval is in the form of number of seconds, or hh:mm:ss, and
-        so on; can be used with --create and --alter
 -I, --id=ID	specify channel/item ID in the database; can be used with
-        --info, --alter, --drop (channel's ID), --read, --dump, 
-        --print-links, --mark (both channel's and/or item's IDs;
-        items' IDs can be listed using commas without whitespace)
 -t, --title=regexp
--T, --description=regexp
-        match items whose title or description field(s) match(es)
-        regular expression regexp; can be used with --read, --dump,
-        --print-links, --mark
+-T, --description=text|regexp
 -U, --pub-from=date
 -R, --rec-from=date
-        publication date (item's field) and date when item has been
-        recorded into database; items having date the same or later than
-        specified will be matched; if prepended by --not, then those having
-        date before the specified; can be used with
-        --read, --dump, --print-links, --mark
 -g, --categories=categories
-        match items that have specified categories;
-        categories can be comma-separated list without whitespaces;
-        can be used with --read, --dump, --print-links, --mark
--x, --show-extra        
-        show extra item elements (i.e. that is not some
-        of <title>, <link>, <pubDate>, <description>, <category>, or
-        <guid>); this is a reader (--read, --dump) option; extra elements
-        are shown by default - use this option with --not to disable
 -m, --marked=r|p|s|d
-        match item(s) that are marked by either Read or Primary,
-        or Secondary, or Delete mark; can be used with --read, --dump,
-        --print-links, --mark
 -f, --sort-field=ID|Link|Title|Description|PubDate|RecDate|GUID
-        specify a field selected items have to be sorted by; the default
-        is PubDate; can be used with --read, --dump, --print-links,
-        --mark
 -o, --asc-sort
-        set ascending sort order (the default is descending)
-        can be used with --read, --dump, --print-links, --mark
--e, --tuple=num select only one item from all the multitude of items matching
-        the given parameters; num can be from 1 to number of items; can
-        be used with --read, --dump, --print-links, --mark
+-e, --tuple=num
+-x, --extra        
 -B, --browser=cmdline
-        set a command line the browser program will be started with in
-        the reader; the `%%s' pattern inside the cmdline is to be
-        replaced with item link; the default cmdline is "lynx %%s" or
-        that's been set with RSSTH_BROWSER environment variable
 -v, --verbose=num
-        set the verbosity level; num is one of:
-        0   default
-        1   verbose
-        2   debug
