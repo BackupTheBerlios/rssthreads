@@ -105,7 +105,7 @@ See
 section below.
 Possible parameters:
 .BR \-\-id ,\  \-\-url ,\  \-\-table ,\  \-\-browser ,
-.BR \-\-show-extra ,\  \-\-sort-field ,\  \-\-asc-sort
+.BR \-\-show\-extra ,\  \-\-sort\-field ,\  \-\-asc\-sort
 and also all filter parameters (see below)
 to select items to view.
 .TP
@@ -114,7 +114,7 @@ Output items of a channel specified by ID, URL or table name.
 It looks like reader, but without stop and command prompt.
 Possible parameters:
 .BR \-\-id ,\  \-\-url ,\  \-\-table ,
-.BR \-\-show-extra ,\  \-\-sort-field ,\  \-\-asc-sort
+.BR \-\-show\-extra ,\  \-\-sort\-field ,\  \-\-asc\-sort
 and also all filter parameters (see below)
 to select items to dump.
 .TP
@@ -196,7 +196,7 @@ can belong to either one or another group.
 --link,
 --interval,
 --description,
---extra,
+--show\-extra,
 --sort-field,
 --asc-sort,
 --browser,
@@ -260,7 +260,7 @@ Those parameters are
 .BR \-\-pub\-from ,
 .BR \-\-rec\-from ,
 .BR \-\-categories ,
-.BR \-\-extra ,
+.BR \-\-show\-extra ,
 .BR \-\-marked\  and
 .BR \-\-asc\-sort .
 .TP
@@ -421,6 +421,24 @@ from 1 to number of items in the prepared set.
 .BR \-\-dump ,
 .BR \-\-print\-links ,
 .BR \-\-mark ).
+.TP
+.B \-x, \-\-show\-extra
+Show \*(lqextra elements\*(rq
+(See
+.B Item Representation
+section).
+(Actions:
+.BR \-\-read ,
+.BR \-\-dump ).
+.TP
+.B \-M, \-\-auto\-mark
+Set Read mark automatically.
+This is default behavior.
+To forbid it use
+.B \-\-not
+before this option.
+(Actions:
+.BR \-\-read ).
 .TP
 .BI "\-B, \-\-browser " cmdline
 Set command line the browser program must be started with from

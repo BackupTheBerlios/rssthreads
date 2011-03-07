@@ -23,7 +23,7 @@ parameters:
 -l, --link=link
 -p, --table=tablename
 -n, --interval=interval
--I, --id=ID	specify channel/item ID in the database; can be used with
+-I, --id=ID
 -t, --title=regexp
 -T, --description=text|regexp
 -U, --pub-from=date
@@ -33,6 +33,7 @@ parameters:
 -f, --sort-field=ID|Link|Title|Description|PubDate|RecDate|GUID
 -o, --asc-sort
 -e, --tuple=num
--x, --extra        
+-x, --show-extra        
+-M, --auto-mark
 -B, --browser=cmdline
 -v, --verbose=num

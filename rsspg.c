@@ -22,7 +22,7 @@ const char *progname;
 
 #define LONGOPTS_INDEX \
 	"a::c::d::e:f:g:hi::l:m:nop:r::st:u:v:x" \
-	"A:B:CF:I:K:L::N:P::R:T:U:"
+	"A:B:CF:I:K:L::MN:P::R:T:U:"
 static const struct option longopts[] = {
 	{"setup", no_argument, NULL, 's'},
 	{"create", optional_argument, NULL, 'c'},
@@ -38,6 +38,7 @@ static const struct option longopts[] = {
 	{"active", no_argument, NULL, 'A'},
 	{"not", no_argument, NULL, 'n'},
 	{"case", no_argument, NULL, 'C'},
+	{"auto-mark", no_argument, NULL, 'M'},
 	{"url", required_argument, NULL, 'u'},
 	{"table", required_argument, NULL, 'p'},
 	{"interval", required_argument, NULL, 'N'},
@@ -168,6 +169,8 @@ int main (int argc, char **argv) {
 				inv = 1; break;
 			case 'C':
 				cs = 1; break;
+			case 'M':
+				if (invflag) sel.noread = 1; break;
 			case 'u':
 				set_link(); break;
 			case 'p':

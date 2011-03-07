@@ -47,6 +47,7 @@ struct selector /* multi-purpose selection structure */ {
 	unsigned short link2_auto;		/* like with id */
 	char *table, *table2;
 	unsigned short table2_auto;  /* like with id */
+	unsigned short noread;		/* don't set read flag automatically */
 	enum {qlf_none, qlf_id, qlf_table, qlf_url} qualifier;
 										/* says what to use to determine RSS channel */
 	char *active;
