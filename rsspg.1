@@ -374,13 +374,19 @@ data type.
 .BI "\-g, \-\-categories " category [, category... ]
 Match RSS items that have specified category (categories).
 .TP
-.B \-m, \-\-marked r|p|s|d
-Match RSS items that are marked by either
-.RB Read\ ( r )
-.RB or\ Primary\ ( p ),
-.RB or\ Secondary\ ( s ),
-.RB or\ Delete\ ( d )
-mark.
+.BI "\-m, \-\-marked " marks
+Match RSS items that are marked by specified marks.
+.I marks
+is set of one-character keys designating that marks.
+Possible keys are: 
+.B r
+for Read,
+.B p
+for Primary,
+.B s
+for Secondary, and
+.B d
+for Delete marks.
 .TP
 .BI "\-f, \-\-sort\-field " field
 Sort output RSS items by

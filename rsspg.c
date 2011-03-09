@@ -114,12 +114,15 @@ int main (int argc, char **argv) {
 		else \
 			set_table() \
 	}
-	#define set_mark(VALUE) switch (*optarg) { \
-		case 'r': sel.readMark = VALUE; break; \
-		case 'p': sel.primaryMark = VALUE; break; \
-		case 's': sel.secondaryMark = VALUE; break; \
-		case 'd': sel.deleteMark = VALUE; break; \
-	}
+
+	#define set_mark(VALUE) do { \
+		switch (*optarg) { \
+			case 'r': sel.readMark = VALUE; break; \
+			case 'p': sel.primaryMark = VALUE; break; \
+			case 's': sel.secondaryMark = VALUE; break; \
+			case 'd': sel.deleteMark = VALUE; break; \
+		} \
+	} while (*(++optarg) != '\0')
 
 	unsigned short inv = 0, cs = 0;
 	#define invflag (inv ? inv-- : inv)
