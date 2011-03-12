@@ -173,7 +173,7 @@ in command line (no matter, in action or in parameter)
 is treated as a specification of an RSS channel.
 All the subsequent specifications take sense depending on action.
 .P
-Theoretically, all parameters can be arranged into three groups:
+Theoretically, all parameters can be arranged into the three groups:
 channel specifying parameters (explained above),
 configuration parameters and filter parameters
 (filtering of RSS items is meant).
@@ -183,38 +183,40 @@ can belong to either one or another group.
 .P
 .B Channel specifying parameters:
 (when not specified by the action argument)
---url,
---link,
---table,
---id.
+\-\-url,
+\-\-link,
+\-\-table,
+\-\-id.
 .P
 .B Configuration parameters:
---not,
---db-keys,
---active,
---url,
---link,
---interval,
---description,
---show\-extra,
---sort-field,
---asc-sort,
---browser,
---verbose.
+\-\-not,
+\-\-db\-keys,
+\-\-active,
+\-\-url,
+\-\-link,
+\-\-interval,
+\-\-description,
+\-\-show\-extra,
+\-\-sort\-field,
+\-\-asc\-sort,
+\-\-auto\-mark
+\-\-browser,
+\-\-desc\-filter,
+\-\-verbose.
 .P
 .B Filter parameters:
---not,
---case,
---url,
---link,
---id,
---title,
---description,
---pub-from,
---rec-from,
---categories,
---marked,
---tuple.
+\-\-not,
+\-\-case,
+\-\-url,
+\-\-link,
+\-\-id,
+\-\-title,
+\-\-description,
+\-\-pub-from,
+\-\-rec\-from,
+\-\-categories,
+\-\-marked,
+\-\-tuple.
 .TP
 .BI "\-K, \-\-db\-keys " conninfo
 Database connection settings.
@@ -291,7 +293,7 @@ Specify an RSS channel by URL.
 .B Configuration:
 Set the RSS channel's URL to 
 .IR link .
-.RB (Actions:\  \-\-create ,\  \-\-alter ).
+.RB (Actions:\  create ,\  alter ).
 .P
 .B Filter:
 Match RSS item whose link is
@@ -307,7 +309,7 @@ Specify an RSS channel by URL.
 .B Configuration:
 Set RSS channel's table name to
 .IR table .
-.RB (Actions:\  \-\-create ,\  \-\-alter ).
+.RB (Actions:\  create ,\  alter ).
 .RE
 .TP
 .BI "\-I, \-\-id " ID [, ID... ]
@@ -327,14 +329,14 @@ is in the form of number of seconds, or \*(lqhh:mm:ss\*(rq,
 or any form possible for PostgreSQL
 .B interval
 data type.
-.RB (Actions:\  \-\-create ,\  \-\-alter ).
+.RB (Actions:\  create ,\  alter ).
 .TP
 .BI "\-T, \-\-description " string
 .RS
 .P
 .B Configuration:
 Give RSS channel description.
-.RB (Actions:\  \-\-create ,\  \-\-alter ).
+.RB (Actions:\  create ,\  alter ).
 .P
 .B Filter:
 Match RSS items whose description field matches the regular expression
@@ -402,18 +404,18 @@ Fields are:
 The default is
 .BR PubDate .
 (Actions:
-.BR \-\-read ,
-.BR \-\-dump ,
-.BR \-\-print\-links ,
-.BR \-\-mark ).
+.BR read ,
+.BR dump ,
+.BR print\-links ,
+.BR mark ).
 .TP
 .B "\-o, \-\-asc\-sort "
 Use ascending sort order (the default is descending).
 (Actions:
-.BR \-\-read ,
-.BR \-\-dump ,
-.BR \-\-print\-links ,
-.BR \-\-mark ).
+.BR read ,
+.BR dump ,
+.BR print\-links ,
+.BR mark ).
 .TP
 .BI "\-e, \-\-tuple " number
 Select only one RSS item 
@@ -423,10 +425,10 @@ sorted and ready to output.
 is not an ID but position,
 from 1 to number of items in the prepared set.
 (Actions:
-.BR \-\-read ,
-.BR \-\-dump ,
-.BR \-\-print\-links ,
-.BR \-\-mark ).
+.BR read ,
+.BR dump ,
+.BR print\-links ,
+.BR mark ).
 .TP
 .B \-x, \-\-show\-extra
 Show \*(lqextra elements\*(rq
@@ -434,8 +436,8 @@ Show \*(lqextra elements\*(rq
 .B Item Representation
 section).
 (Actions:
-.BR \-\-read ,
-.BR \-\-dump ).
+.BR read ,
+.BR dump ).
 .TP
 .B \-M, \-\-auto\-mark
 Set Read mark automatically.
@@ -444,7 +446,7 @@ To forbid it use
 .B \-\-not
 before this option.
 (Actions:
-.BR \-\-read ).
+.BR read ).
 .TP
 .BI "\-B, \-\-browser " cmdline
 Set command line the browser program must be started with from
@@ -457,6 +459,26 @@ This parameter overrides
 .B RSSTH_BROWSER
 environment variable.
 The default commandline is \*(lqlynx %s\*(rq.
+.TP
+.BI "\-D, \-\-desc\-filter [" cmdline ]
+Run description element text of each RSS item
+through a pipe with a shell command
+.I cmdline
+before output.
+This command abolishes default built\-in word\-wrapping of description text.
+Pipe is useful, for example, for stripping HTML tags, 
+or formatting HTML (i.e. with 
+.BR w3m (1)
+console pager/browser in \*(lqdump\*(rq mode), etc.
+If
+.I cmdline
+is omitted, the value can be taken from
+.B RSSTH_DESCFILTER
+environment variable if one is set.
+Otherwise, the command line will be \*(lqcat\*(rq.
+(Actions:
+.BR read ,
+.BR dump ).
 .TP
 .BI "\-v, \-\-verbose " number
 Set verbosity level.
@@ -551,6 +573,11 @@ RSSTH_BROWSER
 Sets browser command line. See description for
 .B \-\-browser
 command above.
+.TP
+RSSTH_DESCFILTER
+Contains a shell command for filtering item descriptions. See
+.B \-\-desc\-filter
+command above.
 .SH BUGS
 There is no way for now to delete marked items
 (by Delete mark) using this program afterwards.
@@ -566,7 +593,9 @@ in, for example,
 program.
 .SH SEE ALSO
 .BR rssthreads (1),
-.BR psql (1).
+.BR psql (1),
+.BR lynx (1),
+.BR w3m (1).
 .P
 .EX
 PostgreSQL Documentation

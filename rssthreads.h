@@ -65,7 +65,8 @@ struct selector /* multi-purpose selection structure */ {
 	char *tuple;
 	char *markSet;						/* argument of '--mark' action */
 	unsigned short hideExtra;	   /* default is descending sort order */
-	char *browser;
+	char *browser;						/* browser cmdline for reader */
+	char *descfilter;					/* item description cmdline for reader */
 };
 
 #define msg_verbose(...) msg_echo ("VERBOSE", __VA_ARGS__)
@@ -190,6 +191,8 @@ typedef struct _rssContext /* rss_context type definition */ {
 	returns screen width */
 /* util.c */ char * word_wrap (char **str); /*
 	makes word wrap on string str according to screen width and returns str */
+/* util.c */ int pipe_output (const char *text, const char *cmd); /*
+	outputs text through a pipe with cmd */
 /* util.c */ int append_where_clause (char **sql, struct selector *sel, const char *table); /*
 	constructs a SQL WHERE-clause from selector _sel_ and appends it to the
 	string pointed by *sql using append() function (returns new pointer in

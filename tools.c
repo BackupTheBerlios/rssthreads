@@ -117,15 +117,23 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 			printf ("CATEGORIES: %s\n", get_field("Categories"));
 
 			char *link = get_field("Link");
-			printf ("%s\n", link);
-
+			printf ("%s\n\n", link);
 
 			char *description = NULL;
 			append (&description, get_field("Description"));
-			printf ("\n%s\n\n", word_wrap(&description));
+			if (sel->descfilter) {
+				if (!pipe_output(description, sel->descfilter)) {
+					free (description);
+					free (sql);
+					db_close (db);
+					return EXIT_FAILURE;
+				}
+			} else {
+				printf ("%s\n", word_wrap(&description));
+			}
 			free (description);
 
-			printf ("GUID: %s\n", get_field("GUID"));
+			printf ("\nGUID: %s\n", get_field("GUID"));
 
 			if (!sel->hideExtra)
 				printf ("%s\n", get_field("ExtraElements"));

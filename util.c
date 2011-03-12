@@ -314,33 +314,47 @@ int get_screen_columns(void) {
 
 char * word_wrap (char **str) {
 	int cols = get_screen_columns();
-
 	char *begin = *str;
 	char *end = begin + strlen(begin);
-	char *cursor = begin;
-	char *old_cursor;
-	char *linebreak = begin;
+	char *cursor, *last_space = NULL, *last_linebreak = NULL;
+	int col_counter;
 
-	while ((cursor += cols) < end) {
-		old_cursor = cursor;
-		while (!isspace (*cursor) && cursor > linebreak)
-			cursor--;
-		if (cursor > linebreak) {
-			*cursor = '\n';
-			linebreak = cursor;
-		} else {
-			cursor = old_cursor;
-			while (++cursor < end) {
-				if (isspace (*cursor)) {
-					*cursor = '\n';
-					linebreak = cursor;
-					break;
-				}
-			}
+	for (cursor=begin, col_counter=1 ; cursor<=end ; cursor++, col_counter++) {
+		if (*cursor == '\n') {
+			last_space = last_linebreak = cursor;
+			col_counter = 0;
+			continue;
+		}
+
+		if (isspace (*cursor))
+			last_space = cursor;
+
+		if ((col_counter==cols) && (last_space>last_linebreak)) {
+				*last_space = '\n';
+				cursor = last_linebreak = last_space;
+				col_counter = 0;
 		}
 	}
-	
+
 	return *str;
+}
+
+int pipe_output (const char *text, const char *cmd) {
+	FILE *descf;
+	char *shcmd = NULL;
+	append (&shcmd,"sh -c '");
+	append (&shcmd, cmd);
+	append (&shcmd, "'");
+	fflush (NULL);
+	descf = popen (shcmd, "w");
+	free (shcmd);
+	if (!descf) {
+		msg_echo ("can't execute filter command:", cmd, NULL);
+		return 0;
+	}
+	fprintf (descf, "%s\n", text);
+	pclose (descf);
+	return 1;
 }
 	
 int append_where_clause (char **sql, struct selector *sel, const char* table) {

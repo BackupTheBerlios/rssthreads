@@ -22,7 +22,7 @@ const char *progname;
 
 #define LONGOPTS_INDEX \
 	"a::c::d::e:f:g:hi::l:m:nop:r::st:u:v:x" \
-	"A:B:CF:I:K:L::MN:P::R:T:U:"
+	"A:B:CD::F:I:K:L::MN:P::R:T:U:"
 static const struct option longopts[] = {
 	{"setup", no_argument, NULL, 's'},
 	{"create", optional_argument, NULL, 'c'},
@@ -55,6 +55,7 @@ static const struct option longopts[] = {
 	{"asc-sort", no_argument, NULL, 'o'},
 	{"tuple", required_argument, NULL, 'e'},
 	{"browser", required_argument, NULL, 'B'},
+	{"desc-filter", optional_argument, NULL, 'D'},
 	{"verbose", required_argument, NULL, 'v'},
 	{"help", no_argument, NULL, 'h'},
 	{NULL, 0, NULL, 0}
@@ -253,6 +254,12 @@ int main (int argc, char **argv) {
 				sel.tuple = optarg; break;
 			case 'B':
 				sel.browser = optarg; break;
+			case 'D':
+				if (optarg)
+					sel.descfilter = optarg;
+				else if (!(sel.descfilter = getenv("RSSTH_DESCFILTER")))
+					sel.descfilter = "cat";
+				break;
 			case 'v':
 				rssth_verbose = strtoul (optarg, NULL, 0); break;
 			//case 'w':
