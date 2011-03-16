@@ -2,15 +2,20 @@ Commands are single letters combined into one string.  After you press
 Enter they will be executed one by one and then the next item will be
 shown. Commands can be the following:
 
-r/R   set/unset Read mark
-p/P   set/unset Primary mark
-s/S   set/unset Secondary mark
-d/D   set/unset Delete mark
--     go one item backward
-+     jump over one item forward
-b     start the browser program with item link as a parameter
-h     display this help
-Q     quit from the reader
+r or 1  set Read mark
+R or 4  unset Read mark
+p or 2  set Primary mark
+P or 5  unset Primary mark
+s or 3  set Secondary mark
+S or 6  unset Secondary mark
+d       set Delete mark
+D       unset Delete mark
+-       go one item backward
++       jump over one item forward
+b or 0  start the browser program with item link as a parameter
+h       display this help
+Q       quit from the reader
 
-Commands can be repeated multiple times. The Read mark is automatically
-set after proceeding to next item.
+Commands can be repeated multiple times. The Read mark is likely
+automatically set when proceeding to next item (see manpage, --auto-mark
+option for details).

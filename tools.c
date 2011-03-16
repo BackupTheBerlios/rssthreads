@@ -108,8 +108,9 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 
 		#define mark_item(MARK, VALUE) db_exec (db, \
 				concat(buf, "UPDATE ", table, \
-					" SET " MARK " = " VALUE " WHERE ID = $1", NULL), \
-				1, get_field("ID"))
+					" SET " MARK " = " #VALUE " WHERE ID = $1", NULL), \
+				1, get_field("ID")); \
+			*(get_field(MARK)) = VALUE
 
 		for (row = 0; row < nrows; row++) {
 			printf ("\n[%s] %s\n\n", get_field("ID"), get_field("Title"));
@@ -158,43 +159,49 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 				fgets (answer, LINE_MAX-1, stdin);
 				
 				if (!sel->noread)
-					mark_item ("ReadMark", "True");
+					mark_item ("ReadMark", 't');
 
 				unsigned short backwind;
 				backwind = 0;
 				for (cursor = answer; *cursor != '\0'; cursor++) {
 					switch (*cursor) {
 						case 'r':
+						case '1':
 							puts ("Read mark setting.");
-							mark_item ("ReadMark", "True");
+							mark_item ("ReadMark", 't');
 							break;
 						case 'R':
+						case '4':
 							puts ("Item unreading.");
-							mark_item ("ReadMark", "False");
+							mark_item ("ReadMark", 'f');
 							break;
 						case 'p':
+						case '2':
 							puts ("Primary mark setting.");
-							mark_item ("PrimaryMark", "True");
+							mark_item ("PrimaryMark", 't');
 							break;
 						case 'P':
+						case '5':
 							puts ("Primary mark unsetting.");
-							mark_item ("PrimaryMark", "False");
+							mark_item ("PrimaryMark", 'f');
 							break;
 						case 's':
+						case '3':
 							puts ("Secondary mark setting.");
-							mark_item ("SecondaryMark", "True");
+							mark_item ("SecondaryMark", 't');
 							break;
 						case 'S':
+						case '6':
 							puts ("Secondary mark unsetting.");
-							mark_item ("SecondaryMark", "False");
+							mark_item ("SecondaryMark", 'f');
 							break;
 						case 'd':
 							puts ("Marking item for deletion.");
-							mark_item ("DeleteMark", "True");
+							mark_item ("DeleteMark", 't');
 							break;
 						case 'D':
 							puts ("Delete mark clearing.");
-							mark_item ("DeleteMark", "False");
+							mark_item ("DeleteMark", 'f');
 							break;
 						case '-':
 							if (backwind) {
@@ -208,6 +215,7 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 							row++;
 							break;
 						case 'b':
+						case '0':
 							if (!backwind) {
 								row--;
 								backwind = 1;

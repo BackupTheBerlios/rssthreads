@@ -521,26 +521,31 @@ First, you can simply press
 .I Enter
 on command prompt to proceed to the next item.
 Command line consists of any number of commands.
-Single command represented by single letter
+Single command represented by single character
 (case is taken into account).
 Spaces are ignored.
 After you press
 .I Enter
 commands are executed in turn from left to right,
+(except
+.BR - " and " +
+commands which are executed after others)
 and then the next item will be printed.
-.IP r
+Numeric equivalents are introduced
+to use with numeric keypad, if preferred.
+.IP r\ or\ 1
 Set Read mark.
 Item is marked read automatically
 when you proceed to the next item.
-.IP R
+.IP R\ or\ 4
 Unset Read mark.
-.IP p
+.IP p\ or\ 2
 Set Primary mark.
-.IP P
+.IP P\ or\ 5
 Unset Primary mark.
-.IP s
+.IP s\ or\ 3
 Set Secondary mark.
-.IP P
+.IP P\ or\ 6
 Unset Secondary mark.
 .IP d
 Mark the item for deletion.
@@ -551,7 +556,7 @@ Go one item backward.
 .IP +
 Jump over one item forward (first time);
 go one item forward (next times).
-.IP b
+.IP b\ or\ 0
 Start browser program with current item link as a parameter.
 .IP h
 Display help.
