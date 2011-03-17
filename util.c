@@ -363,10 +363,12 @@ int append_where_clause (char **sql, struct selector *sel, const char* table) {
 	//char tableName[38];
 	//strcat (strcpy(tableName, prefix), "_Feed");
 
-	if (sel->id2 || sel->title || sel->description || sel->link2 || 
-			sel->pubDate || sel->recDate || sel->cats ||
+	if (sel->id2 || sel->link2 || sel->pubDate || sel->recDate || sel->cats ||
 			sel->noCats || sel->readMark || sel->primaryMark ||
-			sel->secondaryMark || sel->deleteMark) {
+			sel->secondaryMark || sel->deleteMark || sel->title || sel->title_cs ||
+			sel->title_nomatch || sel->title_nomatch_cs || sel->description ||
+			sel->description_cs || sel->description_nomatch || 
+			sel->description_nomatch_cs ) {
 		retval = 1;
 		append (sql, " WHERE ");
 

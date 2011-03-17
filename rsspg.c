@@ -21,44 +21,44 @@
 const char *progname;
 
 #define LONGOPTS_INDEX \
-	"a::c::d::e:f:g:hi::l:m:nop:r::st:u:v:x" \
-	"A:B:CD::F:I:K:L::MN:P::R:T:U:"
+	"AB:CD::F:I:K:L::MN:P::R:T:U:" \
+	"a::c::d::e:f:g:hi::l:m:nop:r::st:u:v:x"
+
 static const struct option longopts[] = {
-	{"setup", no_argument, NULL, 's'},
-	{"create", optional_argument, NULL, 'c'},
-	{"info", optional_argument, NULL, 'i'},
-	{"alter", optional_argument, NULL, 'a'},
-	{"drop", optional_argument, NULL, 'd'},
-	{"read", optional_argument, NULL, 'r'},
-	{"dump", optional_argument, NULL, 'P'},
-	{"print-links", optional_argument, NULL, 'L'},
-	{"mark", required_argument, NULL, 'F'},
-	/* end of actions */
-	{"db-keys", required_argument, NULL, 'K'},
-	{"active", no_argument, NULL, 'A'},
-	{"not", no_argument, NULL, 'n'},
-	{"case", no_argument, NULL, 'C'},
-	{"auto-mark", no_argument, NULL, 'M'},
-	{"url", required_argument, NULL, 'u'},
-	{"table", required_argument, NULL, 'p'},
-	{"interval", required_argument, NULL, 'N'},
-	{"id", required_argument, NULL, 'I'},
-	{"title", required_argument, NULL, 't'},
-	{"link", required_argument, NULL, 'l'},
-	{"description", required_argument, NULL, 'T'},
-	{"pub-from", required_argument, NULL, 'U'},
-	{"rec-from", required_argument, NULL, 'R'},
-	{"categories", required_argument, NULL, 'g'},
-	{"show-extra", no_argument, NULL, 'x'},
-	{"marked", required_argument, NULL, 'm'},
-	{"sort-field", required_argument, NULL, 'f'},
-	{"asc-sort", no_argument, NULL, 'o'},
-	{"tuple", required_argument, NULL, 'e'},
-	{"browser", required_argument, NULL, 'B'},
-	{"desc-filter", optional_argument, NULL, 'D'},
-	{"verbose", required_argument, NULL, 'v'},
-	{"help", no_argument, NULL, 'h'},
-	{NULL, 0, NULL, 0}
+	{"active",        no_argument,         NULL, 'A'},
+	{"browser",       required_argument,   NULL, 'B'},
+	{"case",          no_argument,         NULL, 'C'},
+	{"desc-filter",   optional_argument,   NULL, 'D'},
+	{"mark",          required_argument,   NULL, 'F'},
+	{"id",            required_argument,   NULL, 'I'},
+	{"db-keys",       required_argument,   NULL, 'K'},
+	{"print-links",   optional_argument,   NULL, 'L'},
+	{"auto-mark",     no_argument,         NULL, 'M'},
+	{"interval",      required_argument,   NULL, 'N'},
+	{"dump",          optional_argument,   NULL, 'P'},
+	{"rec-from",      required_argument,   NULL, 'R'},
+	{"description",   required_argument,   NULL, 'T'},
+	{"pub-from",      required_argument,   NULL, 'U'},
+	{"alter",         optional_argument,   NULL, 'a'},
+	{"create",        optional_argument,   NULL, 'c'},
+	{"drop",          optional_argument,   NULL, 'd'},
+	{"tuple",         required_argument,   NULL, 'e'},
+	{"sort-field",    required_argument,   NULL, 'f'},
+	{"categories",    required_argument,   NULL, 'g'},
+	{"help",          no_argument,         NULL, 'h'},
+	{"info",          optional_argument,   NULL, 'i'},
+	{"link",          required_argument,   NULL, 'l'},
+	{"marked",        required_argument,   NULL, 'm'},
+	{"not",           no_argument,         NULL, 'n'},
+	{"asc-sort",      no_argument,         NULL, 'o'},
+	{"table",         required_argument,   NULL, 'p'},
+	{"read",          optional_argument,   NULL, 'r'},
+	{"setup",         no_argument,         NULL, 's'},
+	{"title",         required_argument,   NULL, 't'},
+	{"url",           required_argument,   NULL, 'u'},
+	{"verbose",       required_argument,   NULL, 'v'},
+	{"show-extra",    no_argument,         NULL, 'x'},
+	{NULL,            0,                   NULL, 0}
 };
 
 typedef enum {
