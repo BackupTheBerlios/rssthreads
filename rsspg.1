@@ -513,7 +513,7 @@ GUID: \fI<guid> element\fP
 \fIextra elements in form \*(lqname: content\*(rq (optional)\fP
 
 MARKS: \fImarks if any\fP
-\fIrecording_date\fP   \fIitem_position\fP/\fInumber_of_items\fP
+\fIrecording_date\fP   \fIitem_position\fP/\fInumber_of_items\fP  \fIreverse\fP
 : \fI(command prompt)\fP
 .EE
 .SS Commands
@@ -551,6 +551,11 @@ Unset Secondary mark.
 Mark the item for deletion.
 .IP D
 Unset Delete mark.
+.IP e
+Toggle direction in which items are passed.
+The default direction is forward (i.e. from first to last).
+When reverse direction is turned on,
+you can see \*(lqR\*(rq symbol in last line of each item.
 .IP \-
 Go one item backward.
 .IP +

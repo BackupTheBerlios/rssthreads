@@ -112,7 +112,8 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 				1, get_field("ID")); \
 			*(get_field(MARK)) = VALUE
 
-		for (row = 0; row < nrows; row++) {
+		short direction;
+		for (row = 0, direction = 1; row >= 0 && row < nrows; row += direction) {
 			printf ("\n[%s] %s\n\n", get_field("ID"), get_field("Title"));
 			printf ("DATE: %s\n", get_field("PubDate"));
 			printf ("CATEGORIES: %s\n", get_field("Categories"));
@@ -147,8 +148,8 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 			if (strlen (buf))
 				printf ("MARKS: %s\n", buf);
 			
-			printf ("%s   %d/%d\n",
-					get_field("RecDate"), row+1, nrows);
+			printf ("%s   %d/%d  %s\n", get_field("RecDate"), row+1, nrows,
+					(direction == -1 ? "R" : ""));
 
 			if (dump) {
 				printf ("\n");
@@ -162,8 +163,7 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 					mark_item ("ReadMark", 't');
 				}
 
-				unsigned short backwind;
-				backwind = 0;
+				unsigned short backwind = 0;
 				for (cursor = answer; *cursor != '\0'; cursor++) {
 					switch (*cursor) {
 						case 'r':
@@ -204,21 +204,24 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 							puts ("Delete mark clearing.");
 							mark_item ("DeleteMark", 'f');
 							break;
+						case 'e':
+							direction = -direction;
+							break;
 						case '-':
 							if (backwind) {
-								row--;
+								row -= direction;
 							} else {
-								row -= 2;
+								row -= 2 * direction;
 								backwind = 1;
 							}
 							break;
 						case '+':
-							row++;
+							row += direction;
 							break;
 						case 'b':
 						case '0':
 							if (!backwind) {
-								row--;
+								row -= direction;
 								backwind = 1;
 							}
 							char *cl = malloc(strlen(sel->browser) + strlen(link) + 2);
@@ -229,12 +232,11 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 						case 'h':
 							draw_vline();
 							printf (RSSTH_RHELP);
-							draw_vline();
-							printf ("Press Enter... ");
+							printf ("\nPress Enter... ");
 							getchar();
 							putchar('\n');
 							if (!backwind) {
-								row--;
+								row -= direction;
 								backwind = 1;
 							}
 							break;
@@ -249,9 +251,11 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 								printf ("Unrecognized command: `%c'.\n", (int) *cursor);
 					}
 				}
-				if (row < 0) row = -1;
+				if (direction == 1 && row < 0) row = -1;
+				if (direction == -1 && row > nrows) row = nrows;
 			}
-			if (row < (nrows - 1)) draw_vline();
+			if ((direction == 1 && row < (nrows - 1)) ||
+					(direction == -1 && row > 0)) draw_vline();
 		}
 	}
 	

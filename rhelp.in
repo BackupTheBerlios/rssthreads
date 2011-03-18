@@ -10,6 +10,7 @@ s or 3  set Secondary mark
 S or 6  unset Secondary mark
 d       set Delete mark
 D       unset Delete mark
+e       toggle item set passing direction
 -       go one item backward
 +       jump over one item forward
 b or 0  start the browser program with item link as a parameter
