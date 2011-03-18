@@ -158,8 +158,9 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 				char answer[LINE_MAX], *cursor;
 				fgets (answer, LINE_MAX-1, stdin);
 				
-				if (!sel->noread)
+				if (!sel->noread) {
 					mark_item ("ReadMark", 't');
+				}
 
 				unsigned short backwind;
 				backwind = 0;
