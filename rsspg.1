@@ -190,6 +190,7 @@ can belong to either one or another group.
 .P
 .B Configuration parameters:
 \-\-not,
+\-\-or,
 \-\-db\-keys,
 \-\-active,
 \-\-url,
@@ -273,6 +274,15 @@ Affects the first (only) occurence of
 parameter (in
 .B Filter
 meaning ) among subsequent ones.
+.TP
+.B \-O, \-\-or
+Forces using disjunction when applying filter options.
+By default,
+all filter parameters are joined together using conjunction,
+i.e. logical AND.
+This option constrains 
+.B rsspg
+to use logical OR.
 .TP
 .B \-A, \-\-active
 Set channel to be active
@@ -458,7 +468,7 @@ pattern at the place where RSS item link is to be inserted.
 This parameter overrides
 .B RSSTH_BROWSER
 environment variable.
-The default commandline is \*(lqlynx %s\*(rq.
+The default commandline is \*(lqlynx '%s'\*(rq.
 .TP
 .BI "\-D, \-\-desc\-filter [" cmdline ]
 Run description element text of each RSS item

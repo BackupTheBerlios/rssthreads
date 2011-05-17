@@ -58,8 +58,9 @@ struct selector /* multi-purpose selection structure */ {
 	char *cats;
 	//size_t catsLen;					/* unused */
 	char *noCats;
-	//size_t noCatsLen;					/* unused */
+	//size_t noCatsLen;				/* unused */
 	short readMark, primaryMark, secondaryMark, deleteMark;
+	unsigned short disjunction;   /* use OR in selective queries */
 	char *sortField;
 	unsigned short sortForward;	/* default is descending sort order */
 	char *tuple;

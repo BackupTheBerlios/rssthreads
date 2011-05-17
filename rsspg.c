@@ -21,7 +21,7 @@
 const char *progname;
 
 #define LONGOPTS_INDEX \
-	"AB:CD::F:I:K:L::MN:P::R:T:U:" \
+	"AB:CD::F:I:K:L::MN:OP::R:T:U:" \
 	"a::c::d::e:f:g:hi::l:m:nop:r::st:u:v:x"
 
 static const struct option longopts[] = {
@@ -49,6 +49,7 @@ static const struct option longopts[] = {
 	{"info",          optional_argument,   NULL, 'i'},
 	{"link",          required_argument,   NULL, 'l'},
 	{"marked",        required_argument,   NULL, 'm'},
+	{"or",            no_argument,         NULL, 'O'},
 	{"not",           no_argument,         NULL, 'n'},
 	{"asc-sort",      no_argument,         NULL, 'o'},
 	{"table",         required_argument,   NULL, 'p'},
@@ -80,7 +81,7 @@ int main (int argc, char **argv) {
 	sel.dbKeys = "";
 	sel.qualifier = qlf_none;
 	if (!(sel.browser = getenv("RSSTH_BROWSER")))
-		sel.browser = "lynx %s";
+		sel.browser = "lynx '%s'";
 
 	/* several macros for the options parsing loop */
 
@@ -169,6 +170,8 @@ int main (int argc, char **argv) {
 				break;
 			case 'K':
 				sel.dbKeys = optarg; break;
+			case 'O':
+				sel.disjunction = 1; break;
 			case 'n':
 				inv = 1; break;
 			case 'C':

@@ -19,7 +19,7 @@
 extern unsigned short rssth_verbose;
 
 void msg_echo (const char *begin, ...) {
-	char buf[LINE_MAX];
+	char *buf = NULL;
 	const char *chunk;
 	va_list chunks;
 	va_start (chunks, begin);
@@ -28,21 +28,23 @@ void msg_echo (const char *begin, ...) {
 		return;
 	else if (!strcmp(begin, "VERBOSE") && (rssth_verbose < 1))
 		return;
-	else
-		strcpy (buf, begin);
+	else if (strcmp(begin, "DEBUG") && strcmp(begin, "VERBOSE"))
+		append (&buf, begin);
 
 	if (!strcmp(begin, "VERBOSE") || !strcmp(begin, "DEBUG")) {
 		chunk = va_arg (chunks, char*);
-		strcpy (buf, chunk);
+		append (&buf, chunk);
 	}
 
 	while (chunk = va_arg (chunks, char*)) {
-		strcat (buf, " ");
-		strcat (buf, chunk);
+		append (&buf, " ");
+		append (&buf, chunk);
 	}
-	strcat (buf, "\n");
+	append (&buf, "\n");
 
 	fputs (buf, stderr);
+
+	free (buf);
 }
 
 char * concat (char *buf, ...) {
@@ -372,11 +374,15 @@ int append_where_clause (char **sql, struct selector *sel, const char* table) {
 		retval = 1;
 		append (sql, " WHERE ");
 
-		char *token;
+		char *token, *junction;
 		unsigned short conds = 0;  /* zero if it's no previous WHERE conditions */
+		if (sel->disjunction)
+			junction = " OR ";
+		else
+			junction = " AND ";
 
 		#define conditional_and() \
-			if (conds) append (sql, " AND "); else conds = 1;
+			if (conds) append (sql, junction); else conds = 1;
 		
 		if (sel->id2) {
 			conds = 1;
@@ -385,49 +391,49 @@ int append_where_clause (char **sql, struct selector *sel, const char* table) {
 		
 		if (sel->title) {
 			conditional_and();
-			append (sql, concat(buf, table, ".Title ~* '",
+			append (sql, concat(buf, table, ".Title ~* E'",
 						sel->title, "'", NULL));
 		}
 
 		if (sel->title_cs) {
 			conditional_and();
-			append (sql, concat(buf, table, ".Title ~ '",
+			append (sql, concat(buf, table, ".Title ~ E'",
 						sel->title_cs, "'", NULL));
 		}
 
 		if (sel->title_nomatch) {
 			conditional_and();
-			append (sql, concat(buf, table, ".Title !~* '",
+			append (sql, concat(buf, table, ".Title !~* E'",
 						sel->title_nomatch, "'", NULL));
 		}
 
 		if (sel->title_nomatch_cs) {
 			conditional_and();
-			append (sql, concat(buf, table, ".Title !~ '",
+			append (sql, concat(buf, table, ".Title !~ E'",
 						sel->title_nomatch_cs, "'", NULL));
 		}
 
 		if (sel->description) {
 			conditional_and();
-			append (sql, concat(buf, table, ".Description ~* '",
+			append (sql, concat(buf, table, ".Description ~* E'",
 						sel->description, "'", NULL));
 		}
 
 		if (sel->description_cs) {
 			conditional_and();
-			append (sql, concat(buf, table, ".Description ~ '",
+			append (sql, concat(buf, table, ".Description ~ E'",
 						sel->description_cs, "'", NULL));
 		}
 
 		if (sel->description_nomatch) {
 			conditional_and();
-			append (sql, concat(buf, table, ".Description !~* '",
+			append (sql, concat(buf, table, ".Description !~* E'",
 						sel->description_nomatch, "'", NULL));
 		}
 
 		if (sel->description_nomatch_cs) {
 			conditional_and();
-			append (sql, concat(buf, table, ".Description !~ '",
+			append (sql, concat(buf, table, ".Description !~ E'",
 						sel->description_nomatch_cs, "'", NULL));
 		}
 
@@ -454,20 +460,20 @@ int append_where_clause (char **sql, struct selector *sel, const char* table) {
 						table, ".ID=", table, "_Categories.Item", NULL));
 		}
 		if (sel->cats) {
-			append (sql, " AND "); 
+			append (sql, junction); 
 			append_list (sql, sel->cats, concat(buf,
 						table, "_Categories.Category", NULL));
 		}
 		if (sel->noCats) {
 			char *saveptr;
-			append (sql, " AND ");
+			append (sql, junction);
 			token = strtok_r(sel->noCats, ",", &saveptr);
 			append (sql, concat(buf, "(", table, ".ID", 
 						" NOT IN (SELECT ", table, "_Categories.Item FROM ",
 						table, "_Categories WHERE ",
 						table, "_Categories.Category=", "'", token, "')", NULL));
 			while (token = strtok_r(NULL, ",", &saveptr))
-				append (sql, concat(buf, " AND ", table, ".ID", 
+				append (sql, concat(buf, junction, table, ".ID", 
 						" NOT IN (SELECT ", table, "_Categories.Item FROM ",
 						table, "_Categories WHERE ",
 						table, "_Categories.Category=", "'", token, "')", NULL));
