@@ -190,8 +190,9 @@ Display help and exit.
 HTTP redirections are not yet implemented.
 Generally, if received HTTP response status
 is different from \*(lq200 OK\*(rq, 
-then the status line is output followed by all headers,
-and then the thread processing that channel cancels.
+.B rssthreads
+just closes the network connection
+and prints the HTTP status line followed by all headers.
 So if there is redirection response you can take URL from
 .B Location:
 header printed and use it instead of URL used for this channel.

@@ -18,7 +18,9 @@
 
 pthread_mutex_t rssth_http_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-int http_open (const char *URL) {
+int http_open (const struct selector *sel) {
+	char * URL = sel->link;
+	URL="http://localhost/hello/";
 	char *url = malloc (strlen(URL) + 1);
 	strcpy(url, URL);
 	char *saveptr;
@@ -54,22 +56,28 @@ int http_open (const char *URL) {
 	fprintf (netstream, "Host: %s\n\n", hostname);
 
 	char respstr[LINE_MAX];
+	char * chrptr;
 	fgets(respstr, LINE_MAX, netstream);
 	if (!strstr (respstr, "200 OK")) {
 		msg_echo ("The HTTP response is of not managed type.",
-				"\n\tURL:", URL, NULL);
+				"\n\tThread:", sel->table,
+				"\n\tURL:", URL, 
+				"\n\t---", NULL);
 		do {
-			*(strchr(respstr, '\n')) = ' ';
+			*(strchr(respstr, 0x0a)) = ' ';
+			if (chrptr = strchr(respstr, 0x0d)) *chrptr = ' ';
 			msg_echo ("\t", respstr, NULL);
 			fgets(respstr, LINE_MAX, netstream);
-		} while (respstr[0] != '\n' && respstr[0] != '\r');
-		pthread_exit (NULL);
+		} while (respstr[0] != 0x0a && respstr[0] != 0x0d);
+		//pthread_exit (NULL);
+		fd = 0;
 	} else {
 		do {
-			*(strchr(respstr, '\n')) = ' ';
+			*(strchr(respstr, 0x0a)) = ' ';
+			if (chrptr = strchr(respstr, 0x0d)) *chrptr = ' ';
 			msg_debug ("\t", respstr, NULL);
 			fgets(respstr, LINE_MAX, netstream);
-		} while (respstr[0] != '\n' && respstr[0] != '\r');
+		} while (respstr[0] != 0x0a && respstr[0] != 0x0d);
 	}
 	
 	free (url);

@@ -226,6 +226,7 @@ int rssth_read (struct selector *sel, unsigned short dump) {
 							}
 							char *cl = malloc(strlen(sel->browser) + strlen(link) + 2);
 							sprintf (cl, sel->browser, link);
+							msg_debug ("Running shell command:", cl, NULL);
 							system (cl);
 							free (cl);
 							break;

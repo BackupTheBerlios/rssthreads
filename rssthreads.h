@@ -168,7 +168,7 @@ typedef struct _rssContext /* rss_context type definition */ {
 	makes database record from rss_item object.
 	Returns false on failure */
 
-/* http.c */ int http_open (const char *URL); /*
+/* http.c */ int http_open (const struct selector *sel); /*
 	creates TCP socket connection and starts HTTP session.
 	Returns socket descriptor or zero on error. */
 

@@ -52,7 +52,7 @@ int rssth_get (rss_context context) {
 			return 0;
 		}
 	} else {
-		if (!(infile = http_open(url))) {
+		if (!(infile = http_open(context->sel))) {
 			msg_echo ("Couldn't open", url, NULL);
 			return 0;
 		}
@@ -129,7 +129,7 @@ int rss_thread (void *arg) {
 		XML_ParserFree (parser);
 		rssth_destroy_context (context);
 
-		msg_verbose (sel->table, ": transfer from", sel->link, "end",
+		msg_verbose (sel->table, ": transfer end",
 				"\n\tinterval:", sel->interval, "seconds.", NULL);
 		pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
 		pthread_testcancel();
