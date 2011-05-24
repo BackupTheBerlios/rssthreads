@@ -20,7 +20,6 @@ pthread_mutex_t rssth_http_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int http_open (const struct selector *sel) {
 	char * URL = sel->link;
-	URL="http://localhost/hello/";
 	char *url = malloc (strlen(URL) + 1);
 	strcpy(url, URL);
 	char *saveptr;
