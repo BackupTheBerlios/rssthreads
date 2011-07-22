@@ -237,7 +237,8 @@ int db_info (struct selector *sel) {
 			append (&sql, sel->id);
 			break;
 		case qlf_none:
-			append (&sql, "SELECT ID, TableName, URL FROM RSS ORDER BY ID");
+			append (&sql,
+					"SELECT ID, TableName, Active, URL FROM RSS ORDER BY ID");
 			break;
 	}
 
@@ -251,10 +252,16 @@ int db_info (struct selector *sel) {
 	if (ntuples = PQntuples (res)) {
 		if (sel->qualifier == qlf_none) {
 			for (row = 0; row < ntuples; row++) {
-				printf ("%6u   %-20s %-s\n",
+				char *aflg = PQgetvalue(res, row, 2);
+				if (!strcmp (aflg, "t")) aflg = "A";
+				if (!strcmp (aflg, "f")) aflg = "N";
+				struct t_url url = tokenize_url (PQgetvalue (res, row, 3));
+				printf ("%6u   %-20s  %s   %-s\n",
 						strtoul (PQgetvalue (res, row, 0), NULL, 0),
 						PQgetvalue (res, row, 1),
-						PQgetvalue (res, row, 2));
+						aflg,
+						url.hostname);
+				free (url.url);
 			}
 		} else {
 			#define get_field(FNAME) PQgetvalue(res, 0, PQfnumber(res, FNAME))

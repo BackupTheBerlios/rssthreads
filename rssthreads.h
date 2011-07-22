@@ -70,6 +70,12 @@ struct selector /* multi-purpose selection structure */ {
 	char *descfilter;					/* item description cmdline for reader */
 };
 
+struct t_url /* pointers to misc. parts of url string tokenized by strtok() */ {
+	char *url;       /* begin of the string buffer (to be used with free()) */
+	char *hostname;  /* domain name - up to path */
+	char *path;      /* path - up to the end of string */
+};
+
 #define msg_verbose(...) msg_echo ("VERBOSE", __VA_ARGS__)
 #define msg_debug(...) msg_echo ("DEBUG", __VA_ARGS__)
 /* util.c */ void msg_echo (const char *, ...); /*
@@ -106,6 +112,8 @@ struct selector /* multi-purpose selection structure */ {
 /* util.c */ void * mempcpy (void *dest, const void *src, size_t n); /*
 	replacement for the library function that depends on the _GNU_SOURCE macro */
 #endif
+/* util.c */ struct t_url tokenize_url (const char *url); /*
+   returns structure of pointers to tokenized url. See structure declaration */
 #if 0 //not used
 /* util.c */ int translate_encoding (char *charset); /*
 	Attempt to translate RSS encoding designation go PG one. Return true

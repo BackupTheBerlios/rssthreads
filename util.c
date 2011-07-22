@@ -216,6 +216,19 @@ int translate_encoding (char *encoding) {
 }
 #endif
 
+struct t_url tokenize_url (const char *url) {
+	char *dup = malloc (strlen(url) +1);
+	strcpy (dup, url);
+	struct t_url URL;
+	URL.url = dup;
+	char *saveptr;
+	strtok_r (dup, "/", &saveptr);
+	URL.hostname = strtok_r (NULL, "/", &saveptr);
+	URL.path = strtok_r (NULL, "", &saveptr);
+
+	return URL;
+}
+
 #ifdef RSS_TH
 
 int makestring (char **str, const char *mem, int len) {

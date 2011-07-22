@@ -20,16 +20,11 @@ pthread_mutex_t rssth_http_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int http_open (const struct selector *sel) {
 	char * URL = sel->link;
-	char *url = malloc (strlen(URL) + 1);
-	strcpy(url, URL);
-	char *saveptr;
-	strtok_r (url, "/", &saveptr);
-	char *hostname = strtok_r (NULL, "/", &saveptr);
-	char *location = strtok_r (NULL, "", &saveptr);
+	struct t_url url = tokenize_url (URL);
 	int fd = socket(PF_INET, SOCK_STREAM, 6);
 	struct sockaddr_in in_adrs;
 	in_adrs.sin_family = AF_INET;
-	struct hostent *hostinfo = gethostbyname (hostname);
+	struct hostent *hostinfo = gethostbyname (url.hostname);
 	in_adrs.sin_addr = *(struct in_addr *) hostinfo->h_addr_list[0];
 	in_adrs.sin_port = htons ((uint16_t)80);
 
@@ -51,8 +46,8 @@ int http_open (const struct selector *sel) {
 	}
 	setbuf (netstream, NULL);
 	
-	fprintf (netstream, "GET /%s HTTP/1.0\n", location);
-	fprintf (netstream, "Host: %s\n\n", hostname);
+	fprintf (netstream, "GET /%s HTTP/1.0\n", url.path);
+	fprintf (netstream, "Host: %s\n\n", url.hostname);
 
 	char respstr[LINE_MAX];
 	char * chrptr;
@@ -79,7 +74,7 @@ int http_open (const struct selector *sel) {
 		} while (respstr[0] != 0x0a && respstr[0] != 0x0d);
 	}
 	
-	free (url);
+	free (url.url);
 	fclose(netstream);
 
 	return fd;
