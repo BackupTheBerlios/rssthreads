@@ -242,7 +242,7 @@ int record_item (const rss_item item) {
 
 	if (!item->description) {
 		item->static_description = 1;
-		item->title = "<NO DESCRIPTION>";
+		item->description = "<NO DESCRIPTION>";
 	}
 
 	char buf[LINE_MAX];
