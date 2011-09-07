@@ -200,9 +200,9 @@ void set_parser_callbacks(XML_Parser parser) {
 
 void clear_item (rss_item item) {
 	//puts ("clear-item");
-	if (item->title) free (item->title);
+	if (item->title && !item->static_title) free (item->title);
 	if (item->link) free (item->link);
-	if (item->description) free (item->description);
+	if (item->description && !item->static_description) free (item->description);
 	if (item->pubDate) free (item->pubDate);
 	if (item->guid) free (item->guid);
 	if (item->extra) free (item->extra);
@@ -227,10 +227,22 @@ int record_item (const rss_item item) {
 		return 0;
 	}
 
+#if 0
 	if (!item->title || !item->description) {
 		msg_echo ("Broken RSS item.", NULL);
 		clear_item (item); 
 		return 0;
+	}
+#endif
+	
+	if (!item->title) {
+		item->static_title = 1;
+		item->title = "<NO TITLE>";
+	}
+
+	if (!item->description) {
+		item->static_description = 1;
+		item->title = "<NO DESCRIPTION>";
 	}
 
 	char buf[LINE_MAX];

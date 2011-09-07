@@ -155,6 +155,8 @@ typedef struct _rssItem {
 	char *extra;						/* the place for any extra elements parsed */
 	unsigned char append_flag;		/* some shit */
 	unsigned char error;				/* error flag */
+	unsigned char static_title;		 /* is there <NO TITLE> */
+	unsigned char static_description; /* is there <NO DESCRIPTION> */
 } *rss_item;
 #define RSS_ITEM_SIZE sizeof(struct _rssItem)
 
