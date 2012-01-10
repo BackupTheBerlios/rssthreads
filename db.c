@@ -203,10 +203,10 @@ int db_setup (void) {
 				"Active boolean NOT NULL DEFAULT true, "
 				"URL text NOT NULL UNIQUE, "
 				"Interval interval NOT NULL, "
-				"TableName NOT NULL varchar(32), "
+				"TableName varchar(32) NOT NULL, "
 				"LastRecordDate timestamp(0) with time zone DEFAULT NULL, "
 				"Description text, "
-				"PRIMARY KEY (ID, URL)"
+				"PRIMARY KEY (ID)"
 				")", 0);
 		db_close (db);
 		return (int) res;

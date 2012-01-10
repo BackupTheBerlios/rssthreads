@@ -52,7 +52,7 @@ int http_open (const struct selector *sel) {
 	char respstr[LINE_MAX];
 	char * chrptr;
 	fgets(respstr, LINE_MAX, netstream);
-	if (!strstr (respstr, "200 OK")) {
+	if (!strcasestr (respstr, "200 OK")) {
 		msg_echo ("The HTTP response is of not managed type.",
 				"\n\tThread:", sel->table,
 				"\n\tURL:", URL, 
