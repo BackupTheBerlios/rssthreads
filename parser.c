@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010-2011  Serge V. Baumer
+    Copyright (C) 2010-2012  Serge V. Baumer
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -208,6 +208,7 @@ void clear_item (rss_item item) {
 	if (item->extra) free (item->extra);
 	if (item->cats) free (item->cats);
 }
+
 void try_insert (PGconn *db, char *table, char* id, char *field, char *value, char *spare) {
 	char sql[LINE_MAX];
 	concat (sql, "UPDATE ", table,
@@ -218,7 +219,6 @@ void try_insert (PGconn *db, char *table, char* id, char *field, char *value, ch
 }
 
 int record_item (const rss_item item) {
-	//puts ("record_item");
 	if (item->error) {
 		msg_echo ("Item will not be recorded due to parsing error", NULL);
 		if (item->title)
@@ -227,14 +227,6 @@ int record_item (const rss_item item) {
 		return 0;
 	}
 
-#if 0
-	if (!item->title || !item->description) {
-		msg_echo ("Broken RSS item.", NULL);
-		clear_item (item); 
-		return 0;
-	}
-#endif
-	
 	if (!item->title) {
 		item->static_title = 1;
 		item->title = "<NO TITLE>";
@@ -305,9 +297,8 @@ int record_item (const rss_item item) {
 		}
 		//printf ("ntuples: %d\n", PQntuples(res));
 		if (PQntuples (res)) {
-			msg_echo (verbosity_level,
-					"Duplicating item recording has been avoided.\n\t",
-					uniq_field, ":", uniq_field_ptr, NULL);
+			msg_echo (verbosity_level, "Duplicated item with no date.",
+					uniq_field, "=", uniq_field_ptr, NULL);
 			PQclear (res);
 			clear_item (item);
 			return 0;
@@ -320,6 +311,21 @@ int record_item (const rss_item item) {
 		if (pubDate < item->context->lastRecDate) {
 			clear_item (item);
 			return 1;
+		} else if (item->guid) {
+			if (!(res = db_exec (db, concat(buf, "SELECT COUNT(ID) FROM ",
+					table, " WHERE GUID = $1", NULL), 1, item->guid))) {
+				clear_item (item);
+				return 0;
+			}
+			
+			int cmp = strcmp(PQgetvalue(res, 0, 0), "0");
+			PQclear (res);
+			if (!cmp) {
+				msg_echo ("DEBUG",
+						"Duplicated item. GUID =", item->guid, NULL);
+				clear_item (item);
+				return 0;
+			}
 		}
 	}
 	
