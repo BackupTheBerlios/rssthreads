@@ -297,7 +297,7 @@ int record_item (const rss_item item) {
 		}
 		//printf ("ntuples: %d\n", PQntuples(res));
 		if (PQntuples (res)) {
-			msg_echo (verbosity_level, "Duplicated item with no date.",
+			msg_echo (verbosity_level, "Duplicate item with no date.",
 					uniq_field, "=", uniq_field_ptr, NULL);
 			PQclear (res);
 			clear_item (item);
@@ -322,7 +322,7 @@ int record_item (const rss_item item) {
 			PQclear (res);
 			if (!cmp) {
 				msg_echo ("DEBUG",
-						"Duplicated item. GUID =", item->guid, NULL);
+						"Duplicate item. GUID =", item->guid, NULL);
 				clear_item (item);
 				return 0;
 			}
@@ -401,6 +401,8 @@ int record_item (const rss_item item) {
 		}
 	}
 
+	item->context->itemCounter++;
 	clear_item (item);
 	return 1;
 }
+

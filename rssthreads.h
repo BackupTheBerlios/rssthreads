@@ -168,6 +168,7 @@ typedef struct _rssContext /* rss_context type definition */ {
 	time_t lastRecDate;			/* time of previous RSS capturing */
 	struct selector *sel;		/* selector structure (defined below) */
 	rss_item item;					/* item object (NULL when outside an item tag) */
+	unsigned int itemCounter;	/* counter of new items */
 	int pos;							/* position in the XML stack */
 } *rss_context;
 #define RSS_CONTEXT_SIZE sizeof(struct _rssContext)

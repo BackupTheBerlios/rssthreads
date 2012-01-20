@@ -26,6 +26,7 @@ rss_context rssth_create_context (rss_context prev) {
 		context->parser = prev->parser;
 		context->lastRecDate = prev->lastRecDate;
 		context->prev = prev;
+		context->itemCounter = prev->itemCounter;
 		context->pos = prev->pos + 1;
 	} else {
 		context->pos = -1;
@@ -33,6 +34,10 @@ rss_context rssth_create_context (rss_context prev) {
 }
 
 void rssth_destroy_context (rss_context context) {
+	if (context->prev) {
+		context->prev->itemCounter = context->itemCounter;
+	}
+
 	free (context->tagName);
 	free (context);
 }
@@ -96,6 +101,7 @@ int rssth_get (rss_context context) {
 int rss_thread (void *arg) {
 	struct selector *sel = (struct selector *) arg;
 	unsigned int interval;
+	char buf[50];
 	XML_Parser parser;
 
 	for (interval = strtoul(sel->interval, NULL, 0); ; sleep(interval)) {
@@ -127,10 +133,16 @@ int rss_thread (void *arg) {
 		/* cleanup */
 		db_close (db);
 		XML_ParserFree (parser);
-		rssth_destroy_context (context);
 
-		msg_verbose (sel->table, ": transfer end",
+		if (context->itemCounter) {
+			sprintf (buf, ": %u new items", context->itemCounter);
+		} else {
+			strcpy (buf, ": transfer end");
+		}
+		msg_verbose (sel->table, buf,
 				"\n\tinterval:", sel->interval, "seconds.", NULL);
+
+		rssth_destroy_context (context);
 		pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
 		pthread_testcancel();
 	}
