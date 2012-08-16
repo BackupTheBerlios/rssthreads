@@ -219,10 +219,12 @@ void try_insert (PGconn *db, char *table, char* id, char *field, char *value, ch
 }
 
 int record_item (const rss_item item) {
+	msg_debug ("Begin item recording...", NULL);
+
 	if (item->error) {
 		msg_echo ("Item will not be recorded due to parsing error", NULL);
-		if (item->title)
-			msg_echo ("\tItem title:", item->title, NULL);
+		msg_echo ("\tItem title:", item->title, NULL);
+		msg_echo ("\tItem guid:", item->guid, NULL);
 		clear_item (item);
 		return 0;
 	}
@@ -231,6 +233,8 @@ int record_item (const rss_item item) {
 		item->static_title = 1;
 		item->title = "<NO TITLE>";
 	}
+
+	msg_debug ("\tTitle:", item->title, NULL);
 
 	if (!item->description) {
 		item->static_description = 1;
@@ -244,14 +248,16 @@ int record_item (const rss_item item) {
 	time_t pubDate = 0;
 
 	if (item->pubDate) {
-		char *cursor = item->pubDate;
-		while (*cursor != '\0') {
+		msg_debug ("\tPubDate:", item->pubDate, NULL);
+
+		char *cursor;
+		for (cursor = item->pubDate ; *cursor != '\0' ; cursor++) {
 			if (!isascii ((int) *cursor)){
 				free (item->pubDate);
 				item->pubDate = NULL;
+				msg_debug ("\t\tNon-ASCII characters; cleared.", NULL);
 				break;
 			}
-			cursor++;
 		}
 	}
 
@@ -264,6 +270,8 @@ int record_item (const rss_item item) {
 			strcat (catsbuf, entry);
 		}
 	} else catsbuf = NULL;
+	
+	msg_debug ("\tGUID:", item->guid, NULL);
 
 	const char *parmValues[7];   /* seven just for the next use */
 	int nparms = 0;
@@ -274,15 +282,17 @@ int record_item (const rss_item item) {
 		if (item->guid) {
 			append (&sql, concat(buf, "GUID = '", item->guid, "'", NULL));
 			verbosity_level = "DEBUG";
+			msg_debug ("\tChecking uniqueness by GUID.", NULL);
 			uniq_field = "GUID";
 			uniq_field_ptr = item->guid;
 		} else if (item->title) {
 			verbosity_level = "VERBOSE";
 			append (&sql, concat(buf, "Title = '", item->title, "'", NULL));
+			msg_debug ("\tChecking uniqueness by title.", NULL);
 			uniq_field = "Title";
 			uniq_field_ptr = item->title;
 		} else {
-			msg_echo ("No way to determine the item uniqueness. " 
+			msg_echo ("No way to determine the item's uniqueness. " 
 					"Recording is aborted.", NULL);
 			free (sql);
 			clear_item (item);
@@ -298,17 +308,21 @@ int record_item (const rss_item item) {
 		//printf ("ntuples: %d\n", PQntuples(res));
 		if (PQntuples (res)) {
 			msg_echo (verbosity_level, "Duplicate item with no date.",
-					uniq_field, "=", uniq_field_ptr, NULL);
+					uniq_field, "=", uniq_field_ptr, "... recording is aborted",
+					NULL);
 			PQclear (res);
 			clear_item (item);
 			return 0;
 		}
 		PQclear (res);
 	}
+
+	msg_debug ("\tChecking uniqueness by PubDate/GUID.", NULL);
 	
 	if (item->context->lastRecDate && item->pubDate) {
 		pubDate = parse_time(item->pubDate);
 		if (pubDate < item->context->lastRecDate) {
+			msg_debug ("Filtered out by PubDate... recording is aborted.", NULL);
 			clear_item (item);
 			return 1;
 		} else if (item->guid) {
@@ -320,9 +334,8 @@ int record_item (const rss_item item) {
 			
 			int cmp = strcmp(PQgetvalue(res, 0, 0), "0");
 			PQclear (res);
-			if (!cmp) {
-				msg_echo ("DEBUG",
-						"Duplicate item. GUID =", item->guid, NULL);
+			if (cmp) {
+				msg_debug ("Filtered out by GUID... recording is aborted.", NULL);
 				clear_item (item);
 				return 0;
 			}
@@ -403,6 +416,7 @@ int record_item (const rss_item item) {
 
 	item->context->itemCounter++;
 	clear_item (item);
+	msg_debug ("Recorded.", NULL);
 	return 1;
 }
 

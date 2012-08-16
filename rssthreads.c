@@ -69,7 +69,9 @@ int rssth_get (rss_context context) {
 	if (PQntuples (res)) {
 		struct tm _lastRecDate, *lastRecDate = &_lastRecDate;
 		memset (lastRecDate, 0, sizeof(struct tm));
-		strptime (PQgetvalue(res, 0, 0), "%Y-%m-%d %H:%M:%S%z", lastRecDate);
+		char* timeString = PQgetvalue(res, 0, 0);
+		msg_debug ("Last recording time:", timeString, NULL);
+		strptime (timeString, "%Y-%m-%d %H:%M:%S%z", lastRecDate);
 		time_t offset = lastRecDate->tm_gmtoff;
 		lastRecDate->tm_gmtoff = 0;
 		context->lastRecDate = timegm (lastRecDate) - offset;
