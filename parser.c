@@ -327,7 +327,7 @@ int record_item (const rss_item item) {
 			return 1;
 		} else if (item->guid) {
 			if (!(res = db_exec (db, concat(buf, "SELECT COUNT(ID) FROM ",
-					table, " WHERE GUID = $1", NULL), 1, item->guid))) {
+					table, " WHERE GUID = $1 AND DeleteMark IS FALSE", NULL), 1, item->guid))) {
 				clear_item (item);
 				return 0;
 			}
